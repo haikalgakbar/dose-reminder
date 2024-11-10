@@ -12,107 +12,6 @@ export const Route = createLazyFileRoute("/")({
   component: Home,
 });
 
-// function Home() {
-//   const { dailyTransaction, isLoading } = useDailyTransactions();
-
-//   if (isLoading) {
-//     return <div>Loading...</div>;
-//   }
-
-//   if (!isLoading && dailyTransaction.length > 0) {
-//     const { takeNow, comingUp, takeLater, takeAsNeeded } =
-//       getDailyReminderMedicines(dailyTransaction[0].medications);
-
-//     return (
-//       <>
-//         <WeeklyCalendar />
-//         {!isArrayEmpty(takeNow) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               <span className="relative flex h-3 w-3 items-center justify-center">
-//                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F96C00] opacity-50"></span>
-//                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F96C00]"></span>
-//               </span>
-//               Take now
-//             </header>
-//             {takeNow.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//         {!isArrayEmpty(comingUp) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               Coming up in{" "}
-//               {formatDistanceToNow(
-//                 new Date().setHours(
-//                   +comingUp[0].timeToConsume!.split(":")[0],
-//                   +comingUp[0].timeToConsume!.split(":")[1],
-//                 ),
-//               )}
-//             </header>
-//             {comingUp.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//         {!isArrayEmpty(takeLater) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               Take later today
-//             </header>
-//             {takeLater.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//         {!isArrayEmpty(takeAsNeeded) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2 pb-28">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               Take as needed
-//             </header>
-//             {takeAsNeeded.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//       </>
-//     );
-//   } else {
-//     return (
-//       <>
-//         <WeeklyCalendar />
-//         <section
-//           id="empty-schedule"
-//           className="flex h-dvh flex-col items-center justify-center text-[#33302E]"
-//         >
-//           <div className="rounded-full bg-white/70 p-4">
-//             <CalendarOff size={24} className="text-[#FFD2A7]" />
-//           </div>
-//           <h2 className="text-xl font-medium">Your schedule is clear 🙌</h2>
-//           <p>Remember to rest or add new medication if necessary.</p>
-//         </section>
-//       </>
-//     );
-//   }
-// }
-
 function Home() {
   const { dailyTransaction, isLoading } = useDailyTransactions();
 
@@ -162,6 +61,30 @@ function Home() {
             transaction={dailyTransaction}
           />
         ) : null}
+        <Section
+          medications={takeLater}
+          headerText="Take later"
+          time="today"
+          transaction={dailyTransaction}
+        />
+        <Section
+          medications={takeLater}
+          headerText="Take later"
+          time="today"
+          transaction={dailyTransaction}
+        />
+        <Section
+          medications={takeLater}
+          headerText="Take later"
+          time="today"
+          transaction={dailyTransaction}
+        />
+        <Section
+          medications={takeLater}
+          headerText="Take later"
+          time="today"
+          transaction={dailyTransaction}
+        />
       </>
     );
   } else {

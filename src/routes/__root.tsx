@@ -18,30 +18,37 @@ function Root() {
 
   return (
     <>
-      <div className="before:from-bg-slate-100/70 fixed bottom-0 flex h-6 w-full items-center justify-center bg-white/70 bg-gradient-to-t from-white/70 to-transparent backdrop-blur-3xl before:fixed before:h-6 before:w-full before:-translate-y-full before:bg-gradient-to-t before:backdrop-blur-3xl before:content-['']">
-        <nav className="m-2 flex w-fit -translate-y-6 gap-2 rounded-2xl border border-slate-100 bg-[#F8F4F2] p-1 text-[#AA9C87] shadow-[0px_8px_16px_0px_rgba(40,37,35,0.2)] backdrop-blur-3xl">
-          <Link
-            to="/"
-            className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl [&.active]:bg-white/70 [&.active]:text-[#F96C00]"
-          >
+      <nav className="fixed bottom-0 flex w-full gap-2 bg-[#171717]/80 p-4 backdrop-blur-xl backdrop-brightness-50">
+        <Link
+          to="/"
+          className="flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl text-[#f5f5f5]"
+        >
+          <span className="rounded-full bg-[#F5F5F5] px-4 py-1 text-[#171717]">
             <CircleCheckBig size={20} />
-          </Link>
-          <Link
-            to="/medicine"
-            className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl [&.active]:bg-white/70 [&.active]:text-[#F96C00]"
-          >
+          </span>
+          <span>Check-in</span>
+        </Link>
+        <Link
+          to="/medicine"
+          className="group flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl text-[#f5f5f5]"
+        >
+          <span className="rounded-full px-4 py-1 text-[#D4D4D4] group-hover:bg-[#404040]">
             <Pill size={20} />
-          </Link>
-          <Link
-            to="/history"
-            className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl [&.active]:bg-white/70 [&.active]:text-[#F96C00]"
-          >
+          </span>
+          <span>Medicine</span>
+        </Link>
+        <Link
+          to="/history"
+          className="group flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl text-[#f5f5f5]"
+        >
+          <span className="rounded-full px-4 py-1 text-[#D4D4D4] group-hover:bg-[#404040]">
             <History size={20} />
-          </Link>
-        </nav>
-      </div>
+          </span>
+          <span>History</span>
+        </Link>
+      </nav>
       <Outlet />
-      <TanStackRouterDevtools />
+      {/* <TanStackRouterDevtools /> */}
     </>
   );
 }
