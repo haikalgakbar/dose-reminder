@@ -1,4 +1,4 @@
-import WeeklyCalendar from "@/components/home/weekly-calendar";
+import Header from "@/features/checkin/components/header";
 import MedicineCardHome from "@/components/home/medicine-card-home";
 import useDailyTransactions from "@/hooks/useDailyTransaction";
 import { createLazyFileRoute } from "@tanstack/react-router";
@@ -25,7 +25,7 @@ function Home() {
 
     return (
       <>
-        <WeeklyCalendar />
+        <Header />
         {!isArrayEmpty(takeNow) ? (
           <Section
             medications={takeNow}
@@ -90,7 +90,7 @@ function Home() {
   } else {
     return (
       <>
-        <WeeklyCalendar />
+        <Header />
         <section
           id="empty-schedule"
           className="flex h-dvh flex-col items-center justify-center text-[#33302E]"
