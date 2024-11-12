@@ -52,12 +52,12 @@ import { cn } from "@/libs/util";
 import { cva, type VariantProps } from "class-variance-authority";
 
 const calendarItemVariants = cva(
-  "flex flex-1 flex-col items-center rounded-2xl p-2 bg-[#262626]",
+  "flex flex-1 flex-col items-center rounded-2xl p-2",
   {
     variants: {
       variant: {
-        default: "text-[#F5F5F5] brightness-[.7]",
-        active: "text-[#F5F5F5]",
+        default: "text-[#F5F5F5]",
+        active: "text-[#F5F5F5] bg-[#262626]",
       },
     },
     defaultVariants: {
@@ -114,7 +114,7 @@ function CalendarStatus({ status }: { status: CalendarItemStatus }) {
         <span className="my-1 h-6 w-6 rounded-full border border-dashed border-[#f5f5f5]"></span>
       );
     case "future":
-      return <span className="my-1 h-6 w-6 rounded-full bg-[#f5f5f5]"></span>;
+      return <span className="my-1 h-6 w-6 rounded-full bg-[#A3A3A3]"></span>;
     default:
       throw new Error(`Unknown status: ${status}`);
   }
