@@ -99,6 +99,11 @@ export type MedicineContextType = {
   updateMedicine: (update: Partial<Omit<TMedicine, "status" | "id">>) => void;
 };
 
+export type MedicineByStatus = {
+  status: MedicationStatus;
+  medicines: TMedicine[];
+};
+
 export const exampleMedicines: TMedicine[] = [
   {
     id: "1",
