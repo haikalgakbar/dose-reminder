@@ -41,6 +41,8 @@ export enum DosageQty {
   Six = "6",
   Seven = "7",
   Eight = "8",
+  Nine = "9",
+  Ten = "10",
 }
 
 export enum ScheduleCategory {
@@ -79,7 +81,7 @@ export type Dosage = {
 
 export type Duration = {
   startDate: string; // ISO 8601 date string
-  endDate?: string; // ISO 8601 date string, optional
+  endDate?: string;
 };
 
 export type TMedicine = {
@@ -109,7 +111,7 @@ export const exampleMedicines: TMedicine[] = [
       details: { minTimeBetweenDoses: null },
     },
     duration: { startDate: "2024-10-01T00:00:00Z" },
-  }, // are take as needed need start date as it is optional?
+  },
   {
     id: "2",
     name: "Vitamin D3",
@@ -263,28 +265,3 @@ export const exampleMedicines: TMedicine[] = [
     },
   },
 ];
-
-// export type DayOfWeek = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
-
-// export type DosageForm =
-//   | "capsules"
-//   | "tablets"
-//   | "pills"
-//   | "injection"
-//   | "vial"
-//   | "ampul"
-//   | "puff"
-//   | "inhaler"
-//   | "suppository"
-//   | "patch"
-//   | "ointment"
-//   | "tablespoon"
-//   | "teaspoon"
-//   | "cream"
-//   | "gel"
-//   | "powder"
-//   | "lozenge"
-//   | "spray"
-//   | "foam"
-//   | "emulsion"
-//   | "paste";

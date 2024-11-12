@@ -1,19 +1,13 @@
 import { Calendar } from "@/components/ui/calendar-custom";
 import { DB_NAME, TRANSACTION_STORE } from "@/constant/db";
 import { getDatas } from "@/libs/db";
-import { cn, getCurrentDate, isArrayEmpty } from "@/libs/util";
+import { getCurrentDate, isArrayEmpty } from "@/libs/util";
 import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
 import { ArrowLeft, ArrowRight, Check, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-  Schedule,
-  ScheduleCategory,
-  AsNeededSchedule,
-  DailySchedule,
-  SpecificDaysSchedule,
-} from "@/types/medicine";
+import { ScheduleCategory } from "@/types/medicine";
 
 export const Route = createLazyFileRoute("/history")({
   component: HistoryPage,
@@ -29,7 +23,7 @@ function HistoryPage() {
   console.log(date?.toISOString(), selectedTransaction);
 
   useEffect(() => {
-    let isMounted = true;
+    // let isMounted = true;
     async function getTransaction() {
       setLoading(true);
       const trx: TTransactionRecord[] = await getDatas<TTransactionRecord>(
@@ -43,7 +37,7 @@ function HistoryPage() {
     getTransaction();
 
     return () => {
-      isMounted = false;
+      // isMounted = false;
     };
   }, [date]);
 
