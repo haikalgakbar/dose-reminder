@@ -101,7 +101,7 @@ export type MedicineContextType = {
 
 export type MedicineByStatus = {
   status: MedicationStatus;
-  medicines: TMedicine[];
+  medicines: TMedicine[] | [];
 };
 
 export const exampleMedicines: TMedicine[] = [

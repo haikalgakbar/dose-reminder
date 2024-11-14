@@ -1,5 +1,5 @@
 import { MedicineByStatus } from "@/types/medicine";
-import { Pill, X, Plus } from "lucide-react";
+import { Pill, X } from "lucide-react";
 import AddMedication from "./add-medicine";
 import { MedicineProvider } from "@/context/medicine";
 
@@ -14,7 +14,10 @@ export default function Header({ meds }: { meds: MedicineByStatus[] }) {
       </header>
       <div className="flex gap-2">
         {meds.map((medicine) => (
-          <article className="w-full rounded-xl bg-[#262626] p-4">
+          <article
+            key={medicine.status}
+            className="w-full rounded-xl bg-[#262626] p-4"
+          >
             <div className="w-fit rounded-full bg-[#f5f5f5] p-3 text-[#262626]">
               {medicine.status === "active" ? (
                 <Pill size={20} />
