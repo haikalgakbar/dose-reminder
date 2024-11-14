@@ -1,15 +1,16 @@
-import { Button } from "@/components/ui/button";
 import { MedicineByStatus } from "@/types/medicine";
 import { Pill, X, Plus } from "lucide-react";
+import AddMedication from "./add-medicine";
+import { MedicineProvider } from "@/context/medicine";
 
 export default function Header({ meds }: { meds: MedicineByStatus[] }) {
   return (
     <section className="flex flex-col gap-2 p-4 text-[#F5F5F5]">
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-medium">Medicine</h2>
-        <Button variant="ghost" className="rounded-full p-2">
-          <Plus />
-        </Button>
+        <MedicineProvider>
+          <AddMedication />
+        </MedicineProvider>
       </header>
       <div className="flex gap-2">
         {meds.map((medicine) => (

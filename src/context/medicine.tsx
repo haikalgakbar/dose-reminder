@@ -5,6 +5,7 @@ import {
   DosageForm,
   DosageQty,
   ScheduleCategory,
+  Schedule,
 } from "@/types/medicine";
 import { getCurrentDate } from "@/libs/util";
 
@@ -18,7 +19,7 @@ export const defaultMedicine: Omit<TMedicine, "status" | "id"> = {
   schedule: {
     category: ScheduleCategory.DailyIntake,
     details: {
-      times: ["06:00"],
+      times: ["00:00"],
     },
   },
   duration: {

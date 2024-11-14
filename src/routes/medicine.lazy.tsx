@@ -5,6 +5,7 @@ import AddMedication from "@/components/medicine/add-medication";
 import { useEffect, useState } from "react";
 import {
   exampleMedicines,
+  MedicationStatus,
   MedicineByStatus,
   ScheduleCategory,
   TMedicine,
@@ -17,57 +18,60 @@ export const Route = createLazyFileRoute("/medicine")({
   component: Medicine,
 });
 
+type TMedicine = {
+  status: MedicationStatus;
+  medicines: TMedicine[];
+};
+
 function Medicine() {
-  // const [loading, setLoading] = useState(true);
-  // const [medicines, setMedicines] = useState<{
-  //   scheduled: TMedicine[];
-  //   asNeeded: TMedicine[];
-  //   suspended: TMedicine[];
-  // }>({
-  //   scheduled: [],
-  //   asNeeded: [],
-  //   suspended: [],
-  // });
+  const [loading, setLoading] = useState(true);
+  const [medicines, setMedicines] = useState<undefined | TMedicine[]>(
+    undefined,
+  );
 
-  // useEffect(() => {
-  //   async function getMedicines() {
-  //     const medicines: TMedicine[] = await getDatas<TMedicine>(
-  //       DB_NAME,
-  //       MEDICINE_STORE,
-  //     );
+  useEffect(() => {
+    if (!loading) setLoading(true);
 
-  //     const scheduledMeds = medicines.filter(
-  //       (med) =>
-  //         med.status === "active" &&
-  //         med.schedule.category !== ScheduleCategory.TakeAsNeeded,
-  //     );
-  //     const asNeededMeds = medicines.filter(
-  //       (med) =>
-  //         med.status === "active" &&
-  //         med.schedule.category === ScheduleCategory.TakeAsNeeded,
-  //     );
-  //     const suspendedMeds = medicines.filter(
-  //       (med) => med.status === "inactive",
-  //     );
+    // function groupMedsByTime(data: TFilter[]) {
+    //   const grouped = Map.groupBy(data, (item) => item.schedule.details.times[0]);
 
-  //     setMedicines({
-  //       scheduled: scheduledMeds,
-  //       asNeeded: asNeededMeds,
-  //       suspended: suspendedMeds,
-  //     });
+    //   return Array.from(grouped, ([key, value]) => ({
+    //     time: key,
+    //     data: value,
+    //   }));
+    // }
 
-  //     setLoading(false);
-  //   }
+    async function getMedicines() {
+      const medicines: TMedicine[] = await getDatas<TMedicine>(
+        DB_NAME,
+        MEDICINE_STORE,
+      );
 
-  //   getMedicines();
-  // }, []);
+      const temp = Map.groupBy(medicines, (item) => item.status);
+      const res: TMedicine[] = Array.from(temp, ([key, value]) => ({
+        status: key,
+        medicines: value,
+      }));
 
-  const medicines = groupMedsByStatus(exampleMedicines) as MedicineByStatus[];
+      setMedicines(res);
+
+      setLoading(false);
+    }
+
+    getMedicines();
+  }, []);
+
+  // const medicines = groupMedsByStatus(exampleMedicines) as MedicineByStatus[];
+
+  console.log(medicines);
+
+  if (loading) return <p>Loading...</p>;
+  if (!medicines) return <p>No medicines found</p>;
 
   return (
     <main>
-      <Header meds={medicines} />
-      {medicines.map((medicine) => (
+      {/* <Header meds={medicines} /> */}
+      {/* {medicines.map((medicine) => (
         <section
           id="empty-schedule"
           className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24"
@@ -91,7 +95,7 @@ function Medicine() {
             ))}
           </div>
         </section>
-      ))}
+      ))} */}
     </main>
   );
 }
