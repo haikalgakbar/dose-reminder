@@ -1,7 +1,7 @@
 import Header from "@/features/checkin/components/header";
 import useDailyTransactions from "@/hooks/useDailyTransaction";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { TTransactionRecord } from "@/types/transaction";
+import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
 import { getCurrentDate } from "@/libs/util";
 import {
   TMedicine,
@@ -68,7 +68,9 @@ function Home() {
 
       // Separate medications into those with a specific schedule and those taken as needed
       const withTime = today.medications.filter(
-        (med) => med.schedule.category !== ScheduleCategory.TakeAsNeeded,
+        (med) =>
+          med.schedule.category !== ScheduleCategory.TakeAsNeeded &&
+          med.consumedAt.length === 0,
       ) as unknown as MedicineWithTime[];
 
       const optional = today.medications.filter(
@@ -108,6 +110,7 @@ function Home() {
   )
     return <div>No medicines found</div>;
 
+  console.log(medicines);
   return (
     <main>
       <Header />
@@ -121,7 +124,11 @@ function Home() {
           </header>
           <div className="rounded-xl bg-[#262626]">
             {item.data.map((med) => (
-              <DetailMedicine key={med.id} medicine={med} />
+              <DetailMedicine
+                key={med.id}
+                medicine={med as unknown as MedicineTransaction}
+                transaction={medicines.all[6]}
+              />
             ))}
           </div>
         </section>
@@ -133,7 +140,11 @@ function Home() {
           </header>
           <div className="rounded-xl bg-[#262626]">
             {medicines?.today.optional.map((med) => (
-              <DetailMedicine key={med.id} medicine={med} />
+              <DetailMedicine
+                key={med.id}
+                medicine={med as unknown as MedicineTransaction}
+                transaction={medicines.all[6]}
+              />
             ))}
           </div>
         </section>

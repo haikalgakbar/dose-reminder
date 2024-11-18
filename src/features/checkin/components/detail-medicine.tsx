@@ -22,8 +22,17 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { ScheduleCategory, TMedicine } from "@/types/medicine";
+import handleTakeMedicine from "@/libs/medicine";
+import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
 
-export function DetailMedicine({ medicine }: { medicine: TMedicine }) {
+export function DetailMedicine({
+  medicine,
+  transaction,
+}: {
+  // medicine: TMedicine;
+  medicine: MedicineTransaction;
+  transaction: TTransactionRecord;
+}) {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -56,17 +65,61 @@ export function DetailMedicine({ medicine }: { medicine: TMedicine }) {
           <DetailMedicineTrigger medicine={medicine} />
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="bg-neutral-800/80 text-neutral-200 backdrop-blur-md">
         <DrawerHeader className="text-left">
-          <DrawerTitle>Edit profile</DrawerTitle>
-          <DrawerDescription>
+          <DrawerTitle>{medicine.name}</DrawerTitle>
+          <DrawerDescription className="sr-only">
             Make changes to your profile here. Click save when you're done.
           </DrawerDescription>
         </DrawerHeader>
-        <h1>Detail</h1>
+        <section className="space-y-4 px-4 py-2">
+          <article className="rounded-xl bg-neutral-800 p-4">
+            {medicine.instruction}
+          </article>
+          <section className="gap-4 rounded-xl bg-neutral-800">
+            <article className="flex items-center justify-between border-b border-[#33302E] p-4 last:border-b-0">
+              <span>Dose</span>
+              <span>
+                {medicine.dosage.qty} {medicine.dosage.form}
+              </span>
+            </article>
+            {medicine.schedule.category === ScheduleCategory.TakeAsNeeded &&
+            medicine.schedule.details.minTimeBetweenDoses ? (
+              <article className="flex items-center justify-between p-4">
+                <span>Time</span>
+
+                <span>{medicine.schedule.details.minTimeBetweenDoses}h</span>
+              </article>
+            ) : medicine.schedule.category === ScheduleCategory.DailyIntake ||
+              medicine.schedule.category === ScheduleCategory.SpecificDays ? (
+              <article className="flex items-center justify-between p-4">
+                <span>Time</span>
+
+                <span>{medicine.schedule.details.times[0]}</span>
+              </article>
+            ) : null}
+          </section>
+        </section>
         <DrawerFooter className="pt-2">
           <DrawerClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <>
+              <Button
+                variant="outline"
+                className="rounded-xl bg-neutral-200 text-neutral-800 hover:bg-neutral-300"
+                onClick={() => {
+                  handleTakeMedicine(medicine, transaction);
+                  setOpen((prev) => !prev);
+                }}
+              >
+                Take
+              </Button>
+              <Button
+                variant="ghost"
+                className="hover:bg-transparent hover:text-neutral-400"
+              >
+                Skip
+              </Button>
+            </>
           </DrawerClose>
         </DrawerFooter>
       </DrawerContent>
@@ -74,7 +127,11 @@ export function DetailMedicine({ medicine }: { medicine: TMedicine }) {
   );
 }
 
-function DetailMedicineTrigger({ medicine }: { medicine: TMedicine }) {
+function DetailMedicineTrigger({
+  medicine,
+}: {
+  medicine: MedicineTransaction;
+}) {
   return (
     <>
       <h3 className="text-base font-medium">{medicine.name}</h3>
