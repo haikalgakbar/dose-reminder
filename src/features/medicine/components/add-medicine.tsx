@@ -1,7 +1,7 @@
 import { defaultMedicine } from "@/context/medicine";
 import useMedicineContext from "@/hooks/useMedicineContext";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +11,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CalendarIcon, Plus, Trash, X } from "lucide-react";
+import { ArrowLeft, CalendarIcon, Plus, X } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -32,8 +32,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { cn, getCurrentDate, isArrayEmpty, sortDays } from "@/libs/util";
-import { useFieldArray, useForm, useFormContext } from "react-hook-form";
+import { cn, getCurrentDate, sortDays } from "@/libs/util";
+import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import {
