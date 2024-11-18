@@ -1,23 +1,11 @@
 import Header from "@/features/checkin/components/header";
-import MedicineCardHome from "@/components/home/medicine-card-home";
 import useDailyTransactions from "@/hooks/useDailyTransaction";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import {
-  endOfISOWeek,
-  format,
-  formatDistanceToNow,
-  startOfISOWeek,
-} from "date-fns";
-import { getDailyReminderMedicines } from "@/libs/reminder";
-import { CalendarOff } from "lucide-react";
-import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
-import { getCurrentDate, getDaysOfInterval, isArrayEmpty } from "@/libs/util";
+import { TTransactionRecord } from "@/types/transaction";
+import { getCurrentDate } from "@/libs/util";
 import {
   TMedicine,
-  DosageQty,
-  DosageForm,
   ScheduleCategory,
-  DayOfWeek,
   DailySchedule,
   SpecificDaysSchedule,
   AsNeededSchedule,
@@ -25,6 +13,7 @@ import {
 import { useEffect, useState } from "react";
 import { getDatas } from "@/libs/db";
 import { DB_NAME, TRANSACTION_STORE } from "@/constant/db";
+import { DetailMedicine } from "@/features/checkin/components/detail-medicine";
 
 export const Route = createLazyFileRoute("/")({
   component: Home,
@@ -119,8 +108,6 @@ function Home() {
   )
     return <div>No medicines found</div>;
 
-  console.log(medicines);
-
   return (
     <main>
       <Header />
@@ -134,16 +121,7 @@ function Home() {
           </header>
           <div className="rounded-xl bg-[#262626]">
             {item.data.map((med) => (
-              <article
-                key={med.id}
-                className="cursor-pointer border-b border-[#33302E] p-4 last:border-b-0 hover:bg-[#171717]/40"
-              >
-                <h3 className="font-medium">{med.name}</h3>
-                <p className="line-clamp-1 text-[#A3A3A3]">{med.instruction}</p>
-                <p className="text-[#A3A3A3]">
-                  {med.dosage.qty} {med.dosage.form}
-                </p>
-              </article>
+              <DetailMedicine key={med.id} medicine={med} />
             ))}
           </div>
         </section>
@@ -155,16 +133,7 @@ function Home() {
           </header>
           <div className="rounded-xl bg-[#262626]">
             {medicines?.today.optional.map((med) => (
-              <article
-                key={med.id}
-                className="cursor-pointer border-b border-[#33302E] p-4 last:border-b-0 hover:bg-[#171717]/40"
-              >
-                <h3 className="font-medium">{med.name}</h3>
-                <p className="line-clamp-1 text-[#A3A3A3]">{med.instruction}</p>
-                <p className="text-[#A3A3A3]">
-                  {med.dosage.qty} {med.dosage.form}
-                </p>
-              </article>
+              <DetailMedicine key={med.id} medicine={med} />
             ))}
           </div>
         </section>
