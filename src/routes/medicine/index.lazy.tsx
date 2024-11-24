@@ -9,7 +9,7 @@ import { getDatas } from "@/libs/db";
 import { DB_NAME, MEDICINE_STORE } from "@/constant/db";
 import Header from "@/features/medicine/components/header";
 
-export const Route = createLazyFileRoute("/medicine")({
+export const Route = createLazyFileRoute("/medicine/")({
   component: Medicine,
 });
 
@@ -90,3 +90,5 @@ function Medicine() {
     </main>
   );
 }
+
+export default Route;
