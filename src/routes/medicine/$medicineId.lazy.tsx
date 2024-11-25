@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Pencil, Clock3, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Duration from "@/features/medicine/components/duration";
+import Dosage from "@/features/medicine/components/dosage";
 
 export const Route = createLazyFileRoute("/medicine/$medicineId")({
   component: MedicineDetail,
@@ -56,7 +57,7 @@ function MedicineDetail() {
         </div>
       </section>
       <Duration medicine={medicine} setMedicine={setMedicine} />
-      <MedicineDetailSection type="dosage" />
+      <Dosage medicine={medicine} setMedicine={setMedicine} />
       <MedicineDetailSection type="frequency" />
     </>
   );
