@@ -3,11 +3,12 @@ import { getData } from "@/libs/db";
 import { TMedicine } from "@/types/medicine";
 import { DB_NAME, MEDICINE_STORE } from "@/constant/db";
 import { useEffect, useState } from "react";
-import { Pencil, Clock3, Trash2, ChevronRight } from "lucide-react";
+import { Clock3, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Duration from "@/features/medicine/components/duration";
 import Dosage from "@/features/medicine/components/dosage";
 import EditMedication from "@/features/medicine/components/edit";
+import Frequency from "@/features/medicine/components/frequency";
 
 export const Route = createLazyFileRoute("/medicine/$medicineId")({
   component: MedicineDetail,
@@ -56,102 +57,7 @@ function MedicineDetail() {
       </section>
       <Duration medicine={medicine} setMedicine={setMedicine} />
       <Dosage medicine={medicine} setMedicine={setMedicine} />
-      <MedicineDetailSection type="frequency" />
+      <Frequency medicine={medicine} setMedicine={setMedicine} />
     </>
   );
-}
-
-function MedicineDetailSection({
-  type,
-}: {
-  type: "duration" | "dosage" | "frequency";
-}) {
-  switch (type) {
-    case "duration":
-      return (
-        <section className="space-y-2 p-4 text-neutral-200">
-          <header>
-            <h2>Duration</h2>
-          </header>
-          <div className="rounded-xl bg-neutral-800">
-            <article className="flex items-center justify-between border-b border-[#33302E] p-4 last:border-b-0">
-              <h3>Start</h3>
-              <p className="flex items-center gap-2">
-                01 Oct{" "}
-                <span>
-                  <ChevronRight />
-                </span>
-              </p>
-            </article>
-            <article className="flex items-center justify-between border-b border-[#33302E] p-4 last:border-b-0">
-              <h3>Start</h3>
-              <p className="flex items-center gap-2">
-                01 Oct{" "}
-                <span>
-                  <ChevronRight />
-                </span>
-              </p>
-            </article>
-          </div>
-        </section>
-      );
-    case "dosage":
-      return (
-        <section className="space-y-2 p-4 text-neutral-200">
-          <header>
-            <h2>Dosage</h2>
-          </header>
-          <div className="rounded-xl bg-neutral-800">
-            <article className="flex items-center justify-between border-b border-[#33302E] p-4 last:border-b-0">
-              <h3>Start</h3>
-              <p className="flex items-center gap-2">
-                01 Oct{" "}
-                <span>
-                  <ChevronRight />
-                </span>
-              </p>
-            </article>
-            <article className="flex items-center justify-between border-b border-[#33302E] p-4 last:border-b-0">
-              <h3>Start</h3>
-              <p className="flex items-center gap-2">
-                01 Oct{" "}
-                <span>
-                  <ChevronRight />
-                </span>
-              </p>
-            </article>
-          </div>
-        </section>
-      );
-    case "frequency":
-      return (
-        <section className="space-y-2 p-4 text-neutral-200">
-          <header>
-            <h2>Frequency</h2>
-          </header>
-          <div className="rounded-xl bg-neutral-800">
-            <article className="flex items-center justify-between border-b border-[#33302E] p-4 last:border-b-0">
-              <h3>Start</h3>
-              <p className="flex items-center gap-2">
-                01 Oct{" "}
-                <span>
-                  <ChevronRight />
-                </span>
-              </p>
-            </article>
-            <article className="flex items-center justify-between border-b border-[#33302E] p-4 last:border-b-0">
-              <h3>Start</h3>
-              <p className="flex items-center gap-2">
-                01 Oct{" "}
-                <span>
-                  <ChevronRight />
-                </span>
-              </p>
-            </article>
-          </div>
-        </section>
-      );
-    default:
-      return <></>;
-  }
 }

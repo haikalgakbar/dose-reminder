@@ -1,5 +1,3 @@
-import { defaultMedicine } from "@/context/medicine";
-import useMedicineContext from "@/hooks/useMedicineContext";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { useState } from "react";
 import {
@@ -11,11 +9,10 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CalendarIcon, Plus, X } from "lucide-react";
+import { ChevronRight, Plus, X } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
-  DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
@@ -28,32 +25,22 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { cn, getCurrentDate, sortDays } from "@/libs/util";
+import { z } from "zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { cn, getOrdinalSuffixFromNumber, sortDays } from "@/libs/util";
 import {
-  TMedicine,
-  DosageForm,
-  DosageQty,
-  ScheduleCategory,
-  DayOfWeek,
-  Schedule,
   AsNeededSchedule,
   DailySchedule,
+  DayOfWeek,
+  DosageQty,
+  Schedule,
+  ScheduleCategory,
   SpecificDaysSchedule,
+  TMedicine,
 } from "@/types/medicine";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { format } from "date-fns";
+import { updateData } from "@/libs/db";
+import { DB_NAME, MEDICINE_STORE } from "@/constant/db";
 import {
   Select,
   SelectContent,
@@ -61,14 +48,81 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { nanoid } from "nanoid";
-import { addMedicine } from "@/libs/medicine";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Checkbox } from "@/components/ui/checkbox";
 
-export default function AddMedication() {
+export default function Frequency({
+  medicine,
+  setMedicine,
+}: {
+  medicine: TMedicine;
+  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
+}) {
+  return (
+    <section className="space-y-2 p-4 text-neutral-200">
+      <header>
+        <h2>Frequency</h2>
+      </header>
+      <div className="overflow-hidden rounded-xl bg-neutral-800">
+        <FrequencyForm medicine={medicine} setMedicine={setMedicine} />
+      </div>
+      <div className="overflow-hidden rounded-xl bg-neutral-800">
+        {medicine.schedule.category === ScheduleCategory.DailyIntake ||
+        medicine.schedule.category === ScheduleCategory.SpecificDays ? (
+          medicine.schedule.details.times.map((time, index) => (
+            <FrequencyDetail
+              category={medicine.schedule.category}
+              index={index}
+              time={time}
+              key={index}
+            />
+          ))
+        ) : (
+          <FrequencyDetail
+            category={medicine.schedule.category}
+            index={0}
+            time={medicine.schedule.details.minTimeBetweenDoses}
+          />
+        )}
+      </div>
+    </section>
+  );
+}
+
+function FrequencyDetail({
+  category,
+  index,
+  time,
+}: {
+  category: ScheduleCategory;
+  index: number;
+  time: string | null;
+}) {
+  return category === ScheduleCategory.DailyIntake ||
+    category === ScheduleCategory.SpecificDays ? (
+    <article className="flex items-center justify-between p-4">
+      <h3 className="font-normal">
+        {`${index + 1}${getOrdinalSuffixFromNumber(index + 1)}`} intake
+      </h3>
+      <p className="text-[#A3A3A3]">{time}</p>
+    </article>
+  ) : (
+    <article className="flex items-center justify-between p-4">
+      <h3 className="font-normal">Interval between dose</h3>
+      <p className="text-[#A3A3A3]">{time ? time : "None"}</p>
+    </article>
+  );
+}
+
+function FrequencyForm({
+  medicine,
+  setMedicine,
+}: {
+  medicine: TMedicine;
+  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
+}) {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState(1);
-  const { updateMedicine } = useMedicineContext();
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
@@ -77,7 +131,7 @@ export default function AddMedication() {
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" className="bg-[#1D1B1A]">
-            <Plus size={20} />
+            {/* <Plus size={20} /> */}
             Add medication
           </Button>
         </DialogTrigger>
@@ -94,415 +148,111 @@ export default function AddMedication() {
   }
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={setOpen}
-      onAnimationEnd={() => {
-        updateMedicine(defaultMedicine);
-        setStep(1);
-      }}
-    >
+    <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
         <Button
           variant="ghost"
-          className="flex aspect-square items-center gap-1 rounded-full bg-[#1D1B1A] p-2 text-[#F8F4F2]"
+          className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
         >
-          <Plus size={20} />
+          <h3 className="text-base font-normal">
+            {medicine.schedule.category === ScheduleCategory.DailyIntake
+              ? "Daily"
+              : medicine.schedule.category === ScheduleCategory.SpecificDays
+                ? `Every ${medicine.schedule.details.days.join(", ")}`
+                : "As needed"}
+          </h3>
+          <ChevronRight size={20} />
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
-        <DrawerHeader className="gap-0">
-          {step !== 1 && (
-            <Button
-              variant="ghost"
-              className="-ms-2 h-10 w-10 rounded-xl p-2 hover:bg-black/5"
-              onClick={() => setStep((prev) => prev - 1)}
-            >
-              <ArrowLeft size={18} className="text-neutral-300" />
-            </Button>
-          )}
-          <DrawerTitle
-            className={`${step !== 1 && "pe-8"} w-full text-center text-base uppercase text-[#A3A3A3]`}
-          >
-            New medicine
-          </DrawerTitle>
-        </DrawerHeader>
-        <DialogDescription></DialogDescription>
-        <AddMedicineForm
-          step={step}
-          setStep={setStep}
+      <DrawerContent className="p-4">
+        <DrawerTitle className="sr-only w-full text-center text-base uppercase text-[#A3A3A3]">
+          Change start date
+        </DrawerTitle>
+        <DialogDescription className="sr-only">
+          Change start date
+        </DialogDescription>
+        <EditFrequencyForm
           setOpen={setOpen}
-          className="p-4"
+          medicine={medicine}
+          setMedicine={setMedicine}
         />
       </DrawerContent>
     </Drawer>
   );
 }
 
-// const AddMedicineForm = memo(
-//   ({
-//     step,
-//     setStep,
-//     setOpen,
-//     className,
-//   }: {
-//     step: number;
-//     setStep: React.Dispatch<React.SetStateAction<number>>;
-//     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-//     className: string;
-//   }) => {
-//     return (
-//       <div className={className}>
-//         {step === 1 ? (
-//           <StepOneForm setStep={setStep} />
-//         ) : (
-//           <StepTwoForm setOpen={setOpen} />
-//         )}
-//       </div>
-//     );
-//   },
-// );
-function AddMedicineForm({
-  step,
-  setStep,
+function FormQty({
   setOpen,
-  className,
+  medicine,
+  setMedicine,
 }: {
-  step: number;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  className: string;
+  medicine: TMedicine;
+  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
 }) {
-  return (
-    <div className={className}>
-      {step === 1 ? (
-        <StepOneForm setStep={setStep} />
-      ) : (
-        <StepTwoForm setOpen={setOpen} setStep={setStep} />
-      )}
-    </div>
-  );
-}
-
-function StepOneForm({
-  setStep,
-}: {
-  setStep: React.Dispatch<React.SetStateAction<number>>;
-}) {
-  const { medicine, updateMedicine } = useMedicineContext();
-
-  const formSchema = z
-    .object({
-      name: z.string().min(1),
-      instruction: z.string().min(1).max(100),
-      dosage: z.object({
-        qty: z.nativeEnum(DosageQty),
-        form: z.nativeEnum(DosageForm),
-      }),
-      duration: z.object({
-        startDate: z.string(),
-        endDate: z.string().optional(),
-      }),
-      addEndDate: z.boolean().default(false).optional(),
-    })
-    .refine((data) => {
-      if (data.addEndDate && !data.duration.endDate) {
-        return false;
-      }
-      return true;
-    });
+  const formSchema = z.object({
+    qty: z.nativeEnum(DosageQty),
+  });
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: medicine?.name ?? "",
-      instruction: medicine?.instruction ?? "",
-      dosage: {
-        qty: medicine?.dosage.qty ?? DosageQty.One,
-        form: medicine?.dosage.form ?? DosageForm.Tablets,
-      },
-      duration: {
-        startDate: medicine?.duration?.startDate ?? getCurrentDate(),
-        endDate: medicine?.duration?.endDate ?? undefined,
-      },
-      addEndDate: !!medicine?.duration.endDate,
+      qty: medicine.dosage.qty,
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    updateMedicine({
-      name: values.name,
-      instruction: values.instruction,
-      dosage: {
-        qty: values.dosage.qty,
-        form: values.dosage.form,
-      },
-      duration: {
-        startDate: new Date(values.duration.startDate).toISOString(),
-        endDate: values.addEndDate ? values.duration.endDate : undefined,
-      },
-    });
+    const updatedMedicine = {
+      ...medicine,
+      dosage: { ...medicine.dosage, qty: values.qty },
+    };
 
-    setStep((prev) => prev + 1);
+    updateData(DB_NAME, MEDICINE_STORE, updatedMedicine);
+    setMedicine(updatedMedicine);
+    setOpen((prev) => !prev);
   }
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn("grid items-start gap-4")}
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-4")}>
         <FormField
           control={form.control}
-          name="name"
+          name="qty"
           render={({ field }) => (
-            <FormItem>
+            <FormItem className="[">
               <FormLabel className="font-normal text-neutral-300">
-                Name
+                Dosage qty
               </FormLabel>
               <FormControl>
-                <Input
-                  className="rounded-lg border-none bg-neutral-800 text-neutral-200"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="instruction"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="font-normal text-neutral-300">
-                Instruction
-              </FormLabel>
-              <FormControl>
-                <Textarea
-                  placeholder="At least 30 minutes before eating"
-                  className="resize-none rounded-lg border-none bg-neutral-800 text-neutral-200 placeholder:text-neutral-500"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid gap-2">
-          <p className="text-sm font-normal leading-none text-neutral-300 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-            {" "}
-            How many meds do you take at the same time?
-          </p>
-          <div className="grid grid-cols-6 gap-2">
-            <FormField
-              control={form.control}
-              name="dosage.qty"
-              render={({ field }) => (
-                <FormItem className="col-span-2">
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value.toString()}
-                    >
-                      <SelectTrigger className="rounded-lg border-none bg-neutral-800 text-neutral-200">
-                        <SelectValue placeholder="Select dosage" />
-                      </SelectTrigger>
-                      <SelectContent className="border-none bg-neutral-800 text-neutral-200">
-                        {Object.values(DosageQty).map((qty) => (
-                          <SelectItem
-                            key={qty}
-                            value={qty}
-                            className="focus:bg-neutral-700 focus:text-neutral-100"
-                          >
-                            {qty}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="dosage.form"
-              render={({ field }) => (
-                <FormItem className="col-span-4">
-                  <FormControl>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value.toString()}
-                    >
-                      <SelectTrigger className="w-full rounded-lg border-none bg-neutral-800 text-neutral-200">
-                        <SelectValue placeholder="Choose form" />
-                      </SelectTrigger>
-                      <SelectContent className="border-none bg-neutral-800 text-neutral-200">
-                        {Object.values(DosageForm).map((form) => (
-                          <SelectItem
-                            key={form}
-                            value={form}
-                            className="focus:bg-neutral-700 focus:text-neutral-100"
-                          >
-                            {form}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-        <div className="flex gap-2 *:w-full">
-          <FormField
-            control={form.control}
-            name="duration.startDate"
-            render={({ field }) => (
-              <FormItem className="[">
-                <FormLabel className="font-normal text-neutral-300">
-                  Start date
-                </FormLabel>
-                <FormControl>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full justify-start border-none bg-neutral-800 text-left font-normal text-neutral-200",
-                          !field.value && "text-muted-foreground",
-                        )}
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value.toString()}
+                >
+                  <SelectTrigger className="rounded-lg border-none bg-neutral-800 text-neutral-200">
+                    <SelectValue placeholder="Select dosage" />
+                  </SelectTrigger>
+                  <SelectContent className="border-none bg-neutral-800 text-neutral-200">
+                    {Object.values(DosageQty).map((qty) => (
+                      <SelectItem
+                        key={qty}
+                        value={qty}
+                        className="focus:bg-neutral-700 focus:text-neutral-100"
                       >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto overflow-hidden rounded-lg border-none bg-neutral-800 p-0">
-                      <Calendar
-                        mode="single"
-                        selected={new Date(field.value)}
-                        onSelect={(date) => {
-                          if (date) {
-                            field.onChange(date.toISOString());
-                          }
-                        }}
-                        disabled={(date) =>
-                          date > new Date() || date < new Date("2020-01-01")
-                        }
-                        className="bg-neutral-800 text-neutral-200"
-                        classNames={{
-                          head_cell:
-                            "text-neutral-500 rounded-md w-full font-normal text-[0.8rem]",
-                          cell: "[&:has([aria-selected])]:bg-transparent",
-                          day_today: "bg-none border border-neutral-200",
-                          day_selected:
-                            " rounded-lg focus:bg-neutral-200 focus:text-neutral-800",
-                          day_outside: "text-neutral-500",
-                          day_disabled: "text-neutral-600",
-                        }}
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          {form.getValues().addEndDate && (
-            <FormField
-              control={form.control}
-              name="duration.endDate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="font-normal text-neutral-300">
-                    End date
-                  </FormLabel>
-                  <FormControl>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className={cn(
-                            "w-full justify-start border-none bg-neutral-800 text-left font-normal text-neutral-200",
-                            !field.value && "text-muted-foreground",
-                          )}
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4 text-neutral-200" />
-                          {field.value ? (
-                            format(field.value, "PPP")
-                          ) : (
-                            <span className="text-neutral-500">
-                              Pick a date
-                            </span>
-                          )}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto overflow-hidden rounded-lg border-none bg-neutral-800 p-0">
-                        <Calendar
-                          mode="single"
-                          disabled={(date) =>
-                            date <=
-                            new Date(form.getValues().duration.startDate)
-                          }
-                          // selected={field.value}
-                          onSelect={(date) => {
-                            if (date) {
-                              field.onChange(date.toISOString());
-                            }
-                          }}
-                          className="bg-neutral-800 text-neutral-200"
-                          classNames={{
-                            head_cell:
-                              "text-neutral-500 rounded-md w-full font-normal text-[0.8rem]",
-                            cell: "[&:has([aria-selected])]:bg-transparent",
-                            day_today: "bg-none border border-neutral-200",
-                            day_selected:
-                              " rounded-lg focus:bg-neutral-200 focus:text-neutral-800",
-                            day_outside: "text-neutral-500",
-                            day_disabled: "text-neutral-600",
-                          }}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-        </div>
-        <FormField
-          control={form.control}
-          name="addEndDate"
-          render={({ field }) => (
-            <FormItem className="flex items-center gap-2 text-neutral-300">
-              <FormControl>
-                <Checkbox
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                  className="border-neutral-300"
-                />
+                        {qty}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </FormControl>
-              <FormLabel className="cursor-pointer">End date?</FormLabel>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button
           type="submit"
-          disabled={!form.formState.isValid}
-          className="bg-neutral-100 text-neutral-800 hover:bg-neutral-300"
+          className="w-full bg-neutral-100 text-neutral-800 hover:bg-neutral-300"
         >
-          Next
+          Update
         </Button>
       </form>
     </Form>
@@ -522,14 +272,16 @@ const generateTimeOptions = () => {
 
 const timeOptions = generateTimeOptions();
 
-function StepTwoForm({
+function EditFrequencyForm({
   setOpen,
-  setStep,
+  medicine,
+  setMedicine,
 }: {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setStep: React.Dispatch<React.SetStateAction<number>>;
+  medicine: TMedicine;
+  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
 }) {
-  const { medicine, updateMedicine } = useMedicineContext();
+  // const { medicine, updateMedicine } = useMedicineContext();
 
   const formSchema = z.object({
     category: z.nativeEnum(ScheduleCategory),
@@ -577,7 +329,7 @@ function StepTwoForm({
       };
     } else if (values.category === ScheduleCategory.SpecificDays) {
       details = {
-        days: values.days as DayOfWeek[],
+        days: sortDays(values.days ?? []) as DayOfWeek[],
         times: values.reminderIntake?.map((val) => val.time) as string[],
       };
     } else if (values.category === ScheduleCategory.TakeAsNeeded) {
@@ -599,19 +351,13 @@ function StepTwoForm({
     };
 
     const newMeds: TMedicine = {
-      id: nanoid(8),
-      status: "active",
       ...medicine,
       schedule,
     };
 
     console.log(newMeds);
-
-    addMedicine(newMeds);
-
-    setOpen((prev) => !prev);
-    setStep((prev) => prev - 1);
-    updateMedicine(defaultMedicine);
+    // setMedicine(newMeds);
+    // setOpen((prev) => !prev);
   }
 
   // const useAvailableTimeOptions = (include?: string) => {
