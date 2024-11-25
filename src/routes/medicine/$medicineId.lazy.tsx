@@ -7,6 +7,7 @@ import { Pencil, Clock3, Trash2, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Duration from "@/features/medicine/components/duration";
 import Dosage from "@/features/medicine/components/dosage";
+import EditMedication from "@/features/medicine/components/edit";
 
 export const Route = createLazyFileRoute("/medicine/$medicineId")({
   component: MedicineDetail,
@@ -42,10 +43,7 @@ function MedicineDetail() {
           </p>
         </header>
         <div className="flex gap-2">
-          <Button className="flex h-fit w-full flex-col gap-2 rounded-xl bg-neutral-800 p-4 hover:bg-neutral-700/50">
-            <Pencil className="h-5 w-5 shrink-0" />
-            <h3>Edit</h3>
-          </Button>
+          <EditMedication medicine={medicine} setMedicine={setMedicine} />
           <Button className="flex h-fit w-full flex-col gap-2 rounded-xl bg-neutral-800 p-4 hover:bg-neutral-700/50">
             <Clock3 className="h-5 w-5 shrink-0" />
             <h3>Suspend</h3>
