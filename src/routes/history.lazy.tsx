@@ -5,15 +5,7 @@ import { getCurrentDate, isArrayEmpty } from "@/libs/util";
 import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
-import {
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  ChevronLeft,
-  ChevronRight,
-  Plus,
-  X,
-} from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ScheduleCategory } from "@/types/medicine";
 import { Button } from "@/components/ui/button";

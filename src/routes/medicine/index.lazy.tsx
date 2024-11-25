@@ -1,4 +1,4 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
   MedicineByStatus,
@@ -66,22 +66,24 @@ function Medicine() {
               </header>
               <div className="rounded-xl bg-[#262626]">
                 {medicine.medicines.map((med) => (
-                  <article
-                    key={med.id}
-                    className="cursor-pointer border-b border-[#33302E] p-4 last:border-b-0 hover:bg-[#171717]/40"
-                  >
-                    <h3 className="font-medium">{med.name}</h3>
-                    <p className="line-clamp-1 text-[#A3A3A3]">
-                      {med.instruction}
-                    </p>
-                    <p className="text-[#A3A3A3]">
-                      {med.schedule.category} ·{" "}
-                      {med.schedule.category !== ScheduleCategory.TakeAsNeeded
-                        ? med.schedule.details.times.length
-                        : med.schedule.details.minTimeBetweenDoses}{" "}
-                      times · {med.dosage.qty} {med.dosage.form}
-                    </p>
-                  </article>
+                  <Link to={`/medicine/${med.id}`} key={med.id}>
+                    <article
+                      key={med.id}
+                      className="cursor-pointer border-b border-[#33302E] p-4 last:border-b-0 hover:bg-[#171717]/40"
+                    >
+                      <h3 className="font-medium">{med.name}</h3>
+                      <p className="line-clamp-1 text-[#A3A3A3]">
+                        {med.instruction}
+                      </p>
+                      <p className="text-[#A3A3A3]">
+                        {med.schedule.category} ·{" "}
+                        {med.schedule.category !== ScheduleCategory.TakeAsNeeded
+                          ? med.schedule.details.times.length
+                          : med.schedule.details.minTimeBetweenDoses}{" "}
+                        times · {med.dosage.qty} {med.dosage.form}
+                      </p>
+                    </article>
+                  </Link>
                 ))}
               </div>
             </section>
@@ -90,5 +92,3 @@ function Medicine() {
     </main>
   );
 }
-
-export default Route;
