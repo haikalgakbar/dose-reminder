@@ -8,6 +8,7 @@ import {
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { CircleCheckBig, Pill, History } from "lucide-react";
 import { useEffect } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRoute({
   component: Root,
@@ -64,6 +65,7 @@ function Root() {
         </nav>
       )}
       <Outlet />
+      <Toaster />
       <TanStackRouterDevtools />
     </>
   );
