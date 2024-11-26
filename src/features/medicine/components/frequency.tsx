@@ -300,7 +300,10 @@ function EditFrequencyForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       category: medicine.schedule.category,
-      days: [DayOfWeek.Mon, DayOfWeek.Wed, DayOfWeek.Fri],
+      days:
+        medicine.schedule.category === ScheduleCategory.SpecificDays
+          ? medicine.schedule.details.days
+          : [DayOfWeek.Mon, DayOfWeek.Wed, DayOfWeek.Fri],
       reminderIntake: [
         {
           time: "00:00",
@@ -355,9 +358,9 @@ function EditFrequencyForm({
       schedule,
     };
 
-    console.log(newMeds);
-    // setMedicine(newMeds);
-    // setOpen((prev) => !prev);
+    updateData(DB_NAME, MEDICINE_STORE, newMeds);
+    setMedicine(newMeds);
+    setOpen((prev) => !prev);
   }
 
   // const useAvailableTimeOptions = (include?: string) => {
