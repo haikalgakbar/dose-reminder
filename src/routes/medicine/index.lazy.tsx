@@ -62,7 +62,7 @@ function Medicine() {
               className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24"
             >
               <header>
-                <h2 className="text-xl font-medium">{medicine.status}</h2>
+                <h2 className="ms-4 text-xl font-medium">{medicine.status}</h2>
               </header>
               <div className="rounded-xl bg-[#262626]">
                 {medicine.medicines.map((med) => (

@@ -62,7 +62,7 @@ export default function Frequency({
   return (
     <section className="space-y-2 p-4 text-neutral-200">
       <header>
-        <h2>Frequency</h2>
+        <h2 className="ms-4">Frequency</h2>
       </header>
       <div className="overflow-hidden rounded-xl bg-neutral-800">
         <FrequencyForm medicine={medicine} setMedicine={setMedicine} />

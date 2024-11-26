@@ -56,8 +56,8 @@ function MedicineDetail() {
   return (
     <>
       <section className="space-y-2 p-4 text-neutral-200">
-        <header className="space-y-2">
-          <h2 className="text-center text-xl font-medium">{medicine?.name}</h2>
+        <header className="space-y-4">
+          <h2 className="text-center text-2xl font-medium">{medicine?.name}</h2>
           <p className="line-clamp-1 rounded-xl bg-neutral-800 p-4 text-neutral-300">
             {medicine?.instruction}
           </p>

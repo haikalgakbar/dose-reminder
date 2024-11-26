@@ -49,7 +49,7 @@ export default function Dosage({
   return (
     <section className="space-y-2 p-4 text-neutral-200">
       <header>
-        <h2>Dosage</h2>
+        <h2 className="ms-4">Dosage</h2>
       </header>
       <div className="overflow-hidden rounded-xl bg-neutral-800">
         <DosageQtyEdit medicine={medicine} setMedicine={setMedicine} />
