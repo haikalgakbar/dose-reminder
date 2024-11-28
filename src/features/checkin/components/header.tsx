@@ -1,6 +1,8 @@
 import { getCurrentDate, getDaysOfInterval } from "@/libs/util";
 import { endOfISOWeek, format, startOfISOWeek } from "date-fns";
 import { Check, X } from "lucide-react";
+import { cn } from "@/libs/util";
+import { cva, type VariantProps } from "class-variance-authority";
 
 type CalendarItemStatus =
   | "complete"
@@ -17,7 +19,7 @@ export default function Header() {
   );
 
   return (
-    <header className="flex flex-col gap-2 p-4">
+    <header className="flex select-none flex-col gap-2 p-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-medium text-[#F5F5F5]">Daily check</h2>
         <span className="text-[#D4D4D4]">{currentMonth}</span>
@@ -48,8 +50,7 @@ export default function Header() {
   );
 }
 
-import { cn } from "@/libs/util";
-import { cva, type VariantProps } from "class-variance-authority";
+
 
 const calendarItemVariants = cva(
   "flex flex-1 flex-col items-center rounded-2xl p-2",

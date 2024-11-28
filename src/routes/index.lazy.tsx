@@ -1,8 +1,7 @@
 import Header from "@/features/checkin/components/header";
-import useDailyTransactions from "@/hooks/useDailyTransaction";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
-import { getCurrentDate } from "@/libs/util";
+import { getCurrentDate, isArrayEmpty } from "@/libs/util";
 import {
   TMedicine,
   ScheduleCategory,
@@ -14,6 +13,9 @@ import { useEffect, useState } from "react";
 import { getDatas } from "@/libs/db";
 import { DB_NAME, TRANSACTION_STORE } from "@/constant/db";
 import { DetailMedicine } from "@/features/checkin/components/detail-medicine";
+import { Apple } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Button } from "@/components/ui/button";
 
 export const Route = createLazyFileRoute("/")({
   component: Home,
@@ -40,7 +42,7 @@ type MedicineTime = {
   data: MedicineWithTime[];
 };
 
-type Medicine = {
+export type Medicine = {
   all: TTransactionRecord[];
   today: {
     withTime: MedicineTime[];
@@ -49,8 +51,6 @@ type Medicine = {
 };
 
 function Home() {
-  // const { dailyTransaction, isLoading } = useDailyTransactions();
-
   const [loading, setLoading] = useState(true);
   const [medicines, setMedicines] = useState<Medicine | undefined>(undefined);
 
@@ -61,6 +61,19 @@ function Home() {
       const response = (await getDatas(DB_NAME, TRANSACTION_STORE)).slice(
         -7,
       ) as TTransactionRecord[];
+
+      if (isArrayEmpty(response)) {
+        const emptyMedicines: Medicine = {
+          all: [],
+          today: {
+            withTime: [],
+            optional: [],
+          },
+        };
+        setMedicines(emptyMedicines);
+        setLoading(false);
+        return;
+      }
 
       // Filter today's medications based on the current date
       const todayMeds = response.filter((res) => res.id === getCurrentDate());
@@ -105,10 +118,10 @@ function Home() {
 
   if (loading) return <div>Loading...</div>;
   if (
-    medicines?.today.optional.length === 0 ||
+    medicines?.today.optional.length === 0 &&
     medicines?.today.withTime.length === 0
   )
-    return <div>No medicines found</div>;
+    return <EmptyMedicines />;
 
   console.log(medicines);
   return (
@@ -127,6 +140,7 @@ function Home() {
               <DetailMedicine
                 key={med.id}
                 medicine={med as unknown as MedicineTransaction}
+                setMedicine={setMedicines}
                 transaction={medicines.all[6]}
               />
             ))}
@@ -143,12 +157,72 @@ function Home() {
               <DetailMedicine
                 key={med.id}
                 medicine={med as unknown as MedicineTransaction}
+                setMedicine={setMedicines}
                 transaction={medicines.all[6]}
               />
             ))}
           </div>
         </section>
       ) : null}
+    </main>
+  );
+}
+
+function EmptyMedicines() {
+  return (
+    <main className="flex min-h-screen flex-col">
+      <Header />
+      <section className="flex flex-1 flex-col items-center justify-center gap-2 pb-96 text-neutral-400">
+        <div className="h-full w-fit rounded-full bg-neutral-800 p-4">
+          <Apple className="text-white" />
+        </div>
+        <h2 className="text-2xl font-medium text-neutral-200">
+          Your schedule is clear.
+        </h2>
+        <p>Remember to rest or add new medication if necessary.</p>
+        <Link to="/medicine" className="mt-4">
+          <Button variant="secondary" className="rounded-xl">
+            Add medicine
+          </Button>
+        </Link>
+      </section>
+      {/* {medicines?.today.withTime.map((item, index) => (
+        <section
+          key={index}
+          className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24"
+        >
+          <header>
+            <h2 className="text-xl font-medium">{item.time}</h2>
+          </header>
+          <div className="rounded-xl bg-[#262626]">
+            {item.data.map((med) => (
+              <DetailMedicine
+                key={med.id}
+                medicine={med as unknown as MedicineTransaction}
+                setMedicine={setMedicines}
+                transaction={medicines.all[6]}
+              />
+            ))}
+          </div>
+        </section>
+      ))}
+      {medicines?.today.optional.length ? (
+        <section className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24">
+          <header>
+            <h2 className="text-xl font-medium">Take as needed</h2>
+          </header>
+          <div className="rounded-xl bg-[#262626]">
+            {medicines?.today.optional.map((med) => (
+              <DetailMedicine
+                key={med.id}
+                medicine={med as unknown as MedicineTransaction}
+                setMedicine={setMedicines}
+                transaction={medicines.all[6]}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null} */}
     </main>
   );
 }

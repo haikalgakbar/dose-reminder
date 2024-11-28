@@ -1,6 +1,3 @@
-import * as React from "react";
-
-import { cn } from "@/libs/util";
 import { useMediaQuery } from "@uidotdev/usehooks";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,19 +18,22 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { ScheduleCategory, TMedicine } from "@/types/medicine";
+import { ScheduleCategory } from "@/types/medicine";
 import handleTakeMedicine from "@/libs/medicine";
 import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
+import { Dispatch, SetStateAction, useState } from "react";
+import { Medicine } from "@/routes/index.lazy";
 
 export function DetailMedicine({
   medicine,
+  setMedicine,
   transaction,
 }: {
-  // medicine: TMedicine;
   medicine: MedicineTransaction;
+  setMedicine: Dispatch<SetStateAction<Medicine | undefined>>;
   transaction: TTransactionRecord;
 }) {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   if (isDesktop) {
@@ -108,6 +108,13 @@ export function DetailMedicine({
                 className="rounded-xl bg-neutral-200 text-neutral-800 hover:bg-neutral-300"
                 onClick={() => {
                   handleTakeMedicine(medicine, transaction);
+                  setMedicine((prev) => {
+                    const updatedMedicines = updateMedicines(
+                      prev as Medicine,
+                      medicine.id,
+                    );
+                    return updatedMedicines;
+                  });
                   setOpen((prev) => !prev);
                 }}
               >
@@ -125,6 +132,23 @@ export function DetailMedicine({
       </DrawerContent>
     </Drawer>
   );
+}
+
+function updateMedicines(medicines: Medicine, medicationId: string) {
+  const updatedMedicines = JSON.parse(JSON.stringify(medicines)) as Medicine;
+
+  updatedMedicines.today.withTime = updatedMedicines.today.withTime.map(
+    (time) => ({
+      time: time.time,
+      data: time.data.filter((med) => med.id !== medicationId),
+    }),
+  );
+
+  updatedMedicines.today.withTime = updatedMedicines.today.withTime.filter(
+    (time) => time.data.length > 0,
+  );
+
+  return updatedMedicines;
 }
 
 function DetailMedicineTrigger({

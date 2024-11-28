@@ -33,7 +33,6 @@ import {
   AsNeededSchedule,
   DailySchedule,
   DayOfWeek,
-  DosageQty,
   Schedule,
   ScheduleCategory,
   SpecificDaysSchedule,
@@ -178,84 +177,6 @@ function FrequencyForm({
         />
       </DrawerContent>
     </Drawer>
-  );
-}
-
-function FormQty({
-  setOpen,
-  medicine,
-  setMedicine,
-}: {
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  medicine: TMedicine;
-  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
-}) {
-  const formSchema = z.object({
-    qty: z.nativeEnum(DosageQty),
-  });
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      qty: medicine.dosage.qty,
-    },
-  });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const updatedMedicine = {
-      ...medicine,
-      dosage: { ...medicine.dosage, qty: values.qty },
-    };
-
-    updateData(DB_NAME, MEDICINE_STORE, updatedMedicine);
-    setMedicine(updatedMedicine);
-    setOpen((prev) => !prev);
-  }
-
-  return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-4")}>
-        <FormField
-          control={form.control}
-          name="qty"
-          render={({ field }) => (
-            <FormItem className="[">
-              <FormLabel className="font-normal text-neutral-300">
-                Dosage qty
-              </FormLabel>
-              <FormControl>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value.toString()}
-                >
-                  <SelectTrigger className="rounded-lg border-none bg-neutral-800 text-neutral-200">
-                    <SelectValue placeholder="Select dosage" />
-                  </SelectTrigger>
-                  <SelectContent className="border-none bg-neutral-800 text-neutral-200">
-                    {Object.values(DosageQty).map((qty) => (
-                      <SelectItem
-                        key={qty}
-                        value={qty}
-                        className="focus:bg-neutral-700 focus:text-neutral-100"
-                      >
-                        {qty}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-          className="w-full bg-neutral-100 text-neutral-800 hover:bg-neutral-300"
-        >
-          Update
-        </Button>
-      </form>
-    </Form>
   );
 }
 
