@@ -121,12 +121,30 @@ function Home() {
     medicines?.today.optional.length === 0 &&
     medicines?.today.withTime.length === 0
   )
-    return <EmptyMedicines />;
+    return (
+      <main className="flex min-h-screen flex-col">
+        <Header transactions={medicines!.all} />
+        <section className="flex flex-1 flex-col items-center justify-center gap-2 pb-48 text-neutral-400">
+          <div className="h-full w-fit rounded-full bg-neutral-800 p-4">
+            <Apple className="text-white" />
+          </div>
+          <h2 className="text-2xl font-medium text-neutral-200">
+            Your schedule is clear
+          </h2>
+          <p>Remember to rest or add new medication if necessary.</p>
+          <Link to="/medicine" className="mt-4">
+            <Button variant="outline" className="rounded-xl bg-transparent">
+              Add medicine
+            </Button>
+          </Link>
+        </section>
+      </main>
+    );
 
-  console.log(medicines);
+  console.log("render index");
   return (
     <main>
-      <Header />
+      <Header transactions={medicines!.all} />
       {medicines?.today.withTime.map((item, index) => (
         <section
           key={index}
@@ -136,12 +154,12 @@ function Home() {
             <h2 className="text-xl font-medium">{item.time}</h2>
           </header>
           <div className="rounded-xl bg-[#262626]">
-            {item.data.map((med) => (
+            {item.data.map((med, index) => (
               <DetailMedicine
                 key={med.id}
                 medicine={med as unknown as MedicineTransaction}
                 setMedicine={setMedicines}
-                transaction={medicines.all[6]}
+                transaction={medicines.all[index]}
               />
             ))}
           </div>
@@ -164,65 +182,6 @@ function Home() {
           </div>
         </section>
       ) : null}
-    </main>
-  );
-}
-
-function EmptyMedicines() {
-  return (
-    <main className="flex min-h-screen flex-col">
-      <Header />
-      <section className="flex flex-1 flex-col items-center justify-center gap-2 pb-96 text-neutral-400">
-        <div className="h-full w-fit rounded-full bg-neutral-800 p-4">
-          <Apple className="text-white" />
-        </div>
-        <h2 className="text-2xl font-medium text-neutral-200">
-          Your schedule is clear.
-        </h2>
-        <p>Remember to rest or add new medication if necessary.</p>
-        <Link to="/medicine" className="mt-4">
-          <Button variant="secondary" className="rounded-xl">
-            Add medicine
-          </Button>
-        </Link>
-      </section>
-      {/* {medicines?.today.withTime.map((item, index) => (
-        <section
-          key={index}
-          className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24"
-        >
-          <header>
-            <h2 className="text-xl font-medium">{item.time}</h2>
-          </header>
-          <div className="rounded-xl bg-[#262626]">
-            {item.data.map((med) => (
-              <DetailMedicine
-                key={med.id}
-                medicine={med as unknown as MedicineTransaction}
-                setMedicine={setMedicines}
-                transaction={medicines.all[6]}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
-      {medicines?.today.optional.length ? (
-        <section className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24">
-          <header>
-            <h2 className="text-xl font-medium">Take as needed</h2>
-          </header>
-          <div className="rounded-xl bg-[#262626]">
-            {medicines?.today.optional.map((med) => (
-              <DetailMedicine
-                key={med.id}
-                medicine={med as unknown as MedicineTransaction}
-                setMedicine={setMedicines}
-                transaction={medicines.all[6]}
-              />
-            ))}
-          </div>
-        </section>
-      ) : null} */}
     </main>
   );
 }

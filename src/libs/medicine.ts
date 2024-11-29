@@ -71,22 +71,6 @@ export default function handleTakeMedicine(
   medication: MedicineTransaction,
   transaction: TTransactionRecord,
 ) {
-  // const updatedTransaction = transaction.map((trx) => {
-  //   const medications = trx.medications.map((med) => {
-  //     if (med.medicineId === medication.medicineId) {
-  //       return {
-  //         ...med,
-  //         consumedAt: [...med.consumedAt, format(new Date(), "HH:mm")],
-  //       };
-  //     }
-  //     return med;
-  //   });
-  //   return {
-  //     ...trx,
-  //     medications,
-  //   };
-  // });
-
   const updatedTransaction = {
     ...transaction,
     medications: transaction.medications.map((med) => {
@@ -105,31 +89,5 @@ export default function handleTakeMedicine(
     updatedTransaction.medications,
   );
 
-  // console.log(newTransaction);
-
   updateData(DB_NAME, TRANSACTION_STORE, newTransaction);
-
-  // skibidi
-  // const updatedTransaction = transaction.map((trx) => {
-  //   const medications = trx.medications.map((med) => {
-  //     if (med.medicineId === medication.medicineId) {
-  //       return {
-  //         ...med,
-  //         consumedAt: [...med.consumedAt, format(new Date(), "HH:mm")],
-  //       };
-  //     }
-  //     return med;
-  //   });
-  //   return {
-  //     ...trx,
-  //     medications,
-  //   };
-  // });
-
-  // const newTransaction = processTransaction(
-  //   updatedTransaction[0].id,
-  //   updatedTransaction[0].medications,
-  // );
-
-  // updateData(DB_NAME, TRANSACTION_STORE, newTransaction);
 }
