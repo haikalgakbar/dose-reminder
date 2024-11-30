@@ -1,7 +1,7 @@
 import { defaultMedicine } from "@/context/medicine";
 import useMedicineContext from "@/hooks/useMedicineContext";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -65,7 +65,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { nanoid } from "nanoid";
 import { addMedicine } from "@/libs/medicine";
 
-export default function AddMedication() {
+export default function AddMedication({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const { updateMedicine } = useMedicineContext();
@@ -102,14 +102,7 @@ export default function AddMedication() {
         setStep(1);
       }}
     >
-      <DrawerTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex aspect-square items-center gap-1 rounded-full bg-[#1D1B1A] p-2 text-[#F8F4F2]"
-        >
-          <Plus size={20} />
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-0">
           {step !== 1 && (

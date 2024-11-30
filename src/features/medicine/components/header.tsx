@@ -1,7 +1,8 @@
 import { MedicineByStatus } from "@/types/medicine";
-import { Pill, X } from "lucide-react";
+import { Pill, Plus, X } from "lucide-react";
 import AddMedication from "./add-medicine";
 import { MedicineProvider } from "@/context/medicine";
+import { Button } from "@/components/ui/button";
 
 export default function Header({ meds }: { meds: MedicineByStatus[] }) {
   return (
@@ -9,7 +10,14 @@ export default function Header({ meds }: { meds: MedicineByStatus[] }) {
       <header className="flex items-center justify-between">
         <h2 className="text-2xl font-medium">Medicine</h2>
         <MedicineProvider>
-          <AddMedication />
+          <AddMedication>
+            <Button
+              variant="ghost"
+              className="flex aspect-square items-center gap-1 rounded-full bg-[#1D1B1A] p-2 text-[#F8F4F2]"
+            >
+              <Plus size={20} />
+            </Button>
+          </AddMedication>
         </MedicineProvider>
       </header>
       <div className="flex gap-2">

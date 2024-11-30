@@ -8,6 +8,11 @@ import {
 import { getDatas } from "@/libs/db";
 import { DB_NAME, MEDICINE_STORE } from "@/constant/db";
 import Header from "@/features/medicine/components/header";
+import { isArrayEmpty } from "@/libs/util";
+import { Pill, Plus } from "lucide-react";
+import { MedicineProvider } from "@/context/medicine";
+import AddMedication from "@/features/medicine/components/add-medicine";
+import { Button } from "@/components/ui/button";
 
 export const Route = createLazyFileRoute("/medicine/")({
   component: Medicine,
@@ -27,6 +32,14 @@ function Medicine() {
         DB_NAME,
         MEDICINE_STORE,
       );
+
+      // console.log(medicines);
+
+      if (isArrayEmpty(medicines)) {
+        setMedicines(undefined);
+        setLoading(false);
+        return;
+      }
 
       const temp = Map.groupBy(medicines, (item) => item.status);
 
@@ -48,7 +61,7 @@ function Medicine() {
   }, []);
 
   if (loading) return <p>Loading...</p>;
-  if (!medicines) return <p>No medicines found</p>;
+  if (!medicines) return <EmptyMedication />;
 
   return (
     <main>
@@ -89,6 +102,40 @@ function Medicine() {
             </section>
           ),
       )}
+    </main>
+  );
+}
+
+function EmptyMedication() {
+  return (
+    <main className="flex min-h-screen items-center justify-center">
+      <section className="flex flex-col items-center text-neutral-200">
+        <div className="relative w-fit rounded-full bg-neutral-800 p-4">
+          <Pill className="text-neutral-200" />
+          <div className="absolute bottom-0 right-0 rounded-full bg-neutral-200 p-1 text-neutral-800">
+            <Plus size={16} />
+          </div>
+        </div>
+        <header className="mt-4">
+          <h2 className="text-2xl font-medium">
+            Your medication list is empty
+          </h2>
+        </header>
+        <p className="mb-4 mt-2">
+          Easily manage your health by adding your first medication.
+        </p>
+        <MedicineProvider>
+          <AddMedication>
+            <Button
+              aria-hidden="true"
+              variant="default"
+              className="flex items-center bg-neutral-200 p-4 text-neutral-900 hover:bg-neutral-400"
+            >
+              Add medication
+            </Button>
+          </AddMedication>
+        </MedicineProvider>
+      </section>
     </main>
   );
 }

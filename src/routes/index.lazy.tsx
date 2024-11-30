@@ -14,8 +14,6 @@ import { getDatas } from "@/libs/db";
 import { DB_NAME, TRANSACTION_STORE } from "@/constant/db";
 import { DetailMedicine } from "@/features/checkin/components/detail-medicine";
 import { Apple } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { Button } from "@/components/ui/button";
 
 export const Route = createLazyFileRoute("/")({
   component: Home,
@@ -132,16 +130,10 @@ function Home() {
             Your schedule is clear
           </h2>
           <p>Remember to rest or add new medication if necessary.</p>
-          <Link to="/medicine" className="mt-4">
-            <Button variant="outline" className="rounded-xl bg-transparent">
-              Add medicine
-            </Button>
-          </Link>
         </section>
       </main>
     );
 
-  console.log("render index");
   return (
     <main>
       <Header transactions={medicines!.all} />
