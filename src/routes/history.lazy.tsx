@@ -1,4 +1,4 @@
-import { Calendar } from "@/components/ui/calendar-custom";
+import { Calendar } from "@/components/ui/calendar";
 import { DB_NAME, TRANSACTION_STORE } from "@/constant/db";
 import { getDatas } from "@/libs/db";
 import { getCurrentDate, isArrayEmpty } from "@/libs/util";
@@ -16,48 +16,80 @@ export const Route = createLazyFileRoute("/history")({
 
 function HistoryPage() {
   const today = getCurrentDate();
-  const [date, setDate] = useState<Date | undefined>(new Date(today));
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    new Date(today),
+  );
+  const [currentMonth, setCurrentMonth] = useState<Date | undefined>(
+    new Date(today),
+  );
+
   const [selectedTransaction, setSelectedTransaction] = useState<
     TTransactionRecord[]
   >([]);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
 
   const handleTodayClick = () => {
     const today = new Date();
-    setDate(today);
+    today.setHours(0, 0, 0, 0);
+
+    setSelectedDate(today);
+    setCurrentMonth(today);
   };
 
-  useEffect(() => {
-    // let isMounted = true;
-    async function getTransaction() {
-      setLoading(true);
-      const trx: TTransactionRecord[] = await getDatas<TTransactionRecord>(
-        DB_NAME,
-        TRANSACTION_STORE,
-      );
-      const formatDate = date?.toISOString();
-      setSelectedTransaction(trx.filter((data) => data.id === formatDate));
-      setLoading(false);
+  function handleSelectDate(date: Date) {
+    if (!date || (date && date !== date)) {
+      setSelectedDate(date);
     }
-    getTransaction();
-
-    return () => {
-      // isMounted = false;
-    };
-  }, [date]);
-
-  if (loading) {
-    return <div>Loading...</div>;
   }
+
+  // useEffect(() => {
+  //   // let isMounted = true;
+  //   async function getTransaction() {
+  //     setLoading(true);
+  //     const trx: TTransactionRecord[] = await getDatas<TTransactionRecord>(
+  //       DB_NAME,
+  //       TRANSACTION_STORE,
+  //     );
+  //     const formatDate = date?.toISOString();
+  //     setSelectedTransaction(trx.filter((data) => data.id === formatDate));
+  //     setLoading(false);
+  //   }
+  //   getTransaction();
+
+  //   return () => {
+  //     // isMounted = false;
+  //   };
+  // }, [date]);
+
+  // if (loading) {
+  //   return <div>Loading...</div>;
+  // }
+
+  console.log(currentMonth?.toISOString(), today);
 
   return (
     <>
-      <section className="space-y-4 p-4 pb-2 text-[#F5F5F5]">
+      <section className="space-y-4 p-4 pb-2 text-neutral-200">
         <Calendar
           mode="single"
-          selected={date}
-          onSelect={setDate}
-          className="rounded-md border"
+          selected={selectedDate}
+          onSelect={(date) => {
+            if (!selectedDate || (date && date !== selectedDate)) {
+              setSelectedDate(date);
+            }
+          }}
+          month={currentMonth}
+          className="rounded-md p-0"
+          classNames={{
+            day_today: "border border-neutral-200",
+            row: "flex w-full mt-1 gap-1",
+            cell: "w-full p-0 relative [&:has([aria-selected].day-outside)]:bg-accent/50 focus-within:relative focus-within:z-20 rounded-xl aspect-square justify-center flex items-center [&:has([aria-selected])]:bg-neutral-200",
+            head_row: "flex gap-1",
+            head_cell:
+              "text-neutral-400 w-full font-normal text-sm bg-neutral-800 rounded-full",
+            day: "w-full h-full p-0 font-normal aria-selected:opacity-90 bg-neutral-800 rounded-xl hover:bg-neutral-700 hover:text-white aria-selected:text-neutral-900 aria-selected:bg-neutral-200",
+            day_selected: "bg-neutral-200 text-neutral-900",
+          }}
           weekStartsOn={1}
           showOutsideDays={false}
           formatters={{
@@ -78,7 +110,7 @@ function HistoryPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-7 rounded-lg px-2 text-xs text-zinc-400 hover:text-white"
+                    className={`h-fit rounded-lg px-4 py-2 text-base font-normal text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200 ${selectedDate?.toISOString() === today && currentMonth?.toISOString() === today && "hidden"}`}
                     onClick={handleTodayClick}
                   >
                     Today
@@ -87,16 +119,26 @@ function HistoryPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 rounded-lg text-zinc-400 hover:text-white"
-                      // onClick={() => setDate(new Date(month.getFullYear(), month.getMonth() - 1, 1))}
+                      className="rounded-lg p-2 text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200"
+                      onClick={() =>
+                        setCurrentMonth(
+                          (prev) =>
+                            new Date(prev!.getFullYear(), prev!.getMonth() - 1),
+                        )
+                      }
                     >
-                      <ChevronLeft className="h-4 w-4" />
+                      <ChevronLeft className="h-4 w-4 shrink-0" />
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 rounded-lg text-zinc-400 hover:text-white"
-                      // onClick={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))}
+                      className="rounded-lg p-2 text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200"
+                      onClick={() =>
+                        setCurrentMonth(
+                          (prev) =>
+                            new Date(prev!.getFullYear(), prev!.getMonth() + 1),
+                        )
+                      }
                     >
                       <ChevronRight className="h-4 w-4" />
                     </Button>
@@ -115,7 +157,7 @@ function HistoryPage() {
           }}
         />
       </section>
-      <section className="flex flex-col gap-2 p-4 pt-2 text-[#33302E]">
+      {/* <section className="flex flex-col gap-2 p-4 pt-2 text-[#33302E]">
         <header>
           <h2 className="font-medium text-[#33302E]">
             {date?.getDate() === new Date(today).getDate()
@@ -126,7 +168,7 @@ function HistoryPage() {
         {selectedTransaction[0].medications.map((medication) => (
           <HistoryCard key={medication.id} medication={medication} />
         ))}
-      </section>
+      </section> */}
     </>
   );
 }

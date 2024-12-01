@@ -112,7 +112,7 @@ export default function Header({
       };
     }, [transactions]);
 
-  console.log("render header");
+  // console.log("render header");
 
   return (
     <header className="flex select-none flex-col gap-2 p-4">
