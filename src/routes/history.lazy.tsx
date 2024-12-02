@@ -5,10 +5,17 @@ import { getCurrentDate, isArrayEmpty } from "@/libs/util";
 import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { format } from "date-fns";
-import { Check, ChevronLeft, ChevronRight, X } from "lucide-react";
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  CalendarCheck2,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { ScheduleCategory } from "@/types/medicine";
 import { Button } from "@/components/ui/button";
+import { SelectSingleEventHandler } from "react-day-picker";
 
 export const Route = createLazyFileRoute("/history")({
   component: HistoryPage,
@@ -19,7 +26,7 @@ function HistoryPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
     new Date(today),
   );
-  const [currentMonth, setCurrentMonth] = useState<Date | undefined>(
+  const [selectedMonth, setSelectedMonth] = useState<Date | undefined>(
     new Date(today),
   );
 
@@ -33,39 +40,27 @@ function HistoryPage() {
     today.setHours(0, 0, 0, 0);
 
     setSelectedDate(today);
-    setCurrentMonth(today);
+    setSelectedMonth(today);
   };
 
-  function handleSelectDate(date: Date) {
-    if (!date || (date && date !== date)) {
-      setSelectedDate(date);
+  useEffect(() => {
+    // let isMounted = true;
+    async function getTransaction() {
+      const trx: TTransactionRecord[] = await getDatas<TTransactionRecord>(
+        DB_NAME,
+        TRANSACTION_STORE,
+      );
+      const formatDate = selectedDate?.toISOString();
+      setSelectedTransaction(trx.filter((data) => data.id === formatDate));
     }
-  }
+    getTransaction();
 
-  // useEffect(() => {
-  //   // let isMounted = true;
-  //   async function getTransaction() {
-  //     setLoading(true);
-  //     const trx: TTransactionRecord[] = await getDatas<TTransactionRecord>(
-  //       DB_NAME,
-  //       TRANSACTION_STORE,
-  //     );
-  //     const formatDate = date?.toISOString();
-  //     setSelectedTransaction(trx.filter((data) => data.id === formatDate));
-  //     setLoading(false);
-  //   }
-  //   getTransaction();
+    return () => {
+      // isMounted = false;
+    };
+  }, []);
 
-  //   return () => {
-  //     // isMounted = false;
-  //   };
-  // }, [date]);
-
-  // if (loading) {
-  //   return <div>Loading...</div>;
-  // }
-
-  console.log(currentMonth?.toISOString(), today);
+  console.log(selectedTransaction);
 
   return (
     <>
@@ -78,7 +73,7 @@ function HistoryPage() {
               setSelectedDate(date);
             }
           }}
-          month={currentMonth}
+          month={selectedMonth}
           className="rounded-md p-0"
           classNames={{
             day_today: "border border-neutral-200",
@@ -110,7 +105,7 @@ function HistoryPage() {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className={`h-fit rounded-lg px-4 py-2 text-base font-normal text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200 ${selectedDate?.toISOString() === today && currentMonth?.toISOString() === today && "hidden"}`}
+                    className={`h-fit rounded-lg px-4 py-2 text-base font-normal text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200 ${selectedDate?.toISOString() === today && selectedMonth?.toISOString() === today && "hidden"}`}
                     onClick={handleTodayClick}
                   >
                     Today
@@ -121,7 +116,7 @@ function HistoryPage() {
                       size="icon"
                       className="rounded-lg p-2 text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200"
                       onClick={() =>
-                        setCurrentMonth(
+                        setSelectedMonth(
                           (prev) =>
                             new Date(prev!.getFullYear(), prev!.getMonth() - 1),
                         )
@@ -134,7 +129,7 @@ function HistoryPage() {
                       size="icon"
                       className="rounded-lg p-2 text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200"
                       onClick={() =>
-                        setCurrentMonth(
+                        setSelectedMonth(
                           (prev) =>
                             new Date(prev!.getFullYear(), prev!.getMonth() + 1),
                         )
@@ -157,18 +152,29 @@ function HistoryPage() {
           }}
         />
       </section>
-      {/* <section className="flex flex-col gap-2 p-4 pt-2 text-[#33302E]">
+      <section className="flex h-full flex-col gap-2 p-4 text-neutral-200">
         <header>
-          <h2 className="font-medium text-[#33302E]">
-            {date?.getDate() === new Date(today).getDate()
+          <h2 className="font-medium">
+            {selectedDate?.getDate() === new Date(today).getDate()
               ? `Today, ${format(new Date(getCurrentDate()), "dd MMM yyyy")}`
-              : format(date || "", "EEEE, dd MMM yyyy")}
+              : format(selectedDate || "", "EEEE, dd MMM yyyy")}
           </h2>
         </header>
-        {selectedTransaction[0].medications.map((medication) => (
+        {/* {selectedTransaction[0].medications.map((medication) => (
           <HistoryCard key={medication.id} medication={medication} />
-        ))}
-      </section> */}
+        ))} */}
+        {isArrayEmpty(selectedTransaction) && (
+          <article className="flex flex-col items-center justify-center gap-2 pb-48 text-neutral-400">
+            <div className="mt-20 w-fit rounded-full bg-neutral-800 p-4">
+              <CalendarCheck2 className="text-white" />
+            </div>
+            <h2 className="text-2xl font-medium text-neutral-200">
+              No medication today
+            </h2>
+            <p>You have no medications scheduled for today.</p>
+          </article>
+        )}
+      </section>
     </>
   );
 }
