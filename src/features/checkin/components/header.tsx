@@ -7,8 +7,15 @@ import {
   parseISO,
   startOfISOWeek,
 } from "date-fns";
-import { Check, X } from "lucide-react";
 import { TTransactionRecord } from "@/types/transaction";
+import {
+  CheckIcon,
+  EmptyIcon,
+  FutureIcon,
+  XIcon,
+  PreIcon,
+  CalendarStatusProps,
+} from "@/components/calendar-status";
 
 interface CalendarItemProps {
   date: string;
@@ -16,35 +23,17 @@ interface CalendarItemProps {
   type: "past" | "today" | "future";
 }
 
-interface CalendarStatusProps {
-  type: "check" | "uncheck" | "pre" | "empty";
+function getCalendarType(transaction?: TTransactionRecord) {
+  if (!transaction) return "empty";
+  if (transaction.consumedMedications === transaction.medicationsToBeConsumed)
+    return "check";
+  if (transaction.skippedMedications > 0) return "uncheck";
+  if (transaction.totalMedications === 0) return "empty";
+  if (transaction.totalMedications > 0) return "pre";
+  return "empty";
 }
 
-const CheckIcon = () => (
-  <span className="my-1 rounded-full bg-[#F5F5F5] p-1">
-    <Check size={16} className="text-[#262626]" />
-  </span>
-);
-
-const XIcon = () => (
-  <span className="my-1 rounded-full bg-[#F5F5F5] p-1">
-    <X size={16} className="text-[#262626]" />
-  </span>
-);
-
-const PreIcon = () => (
-  <span className="my-1 h-6 w-6 rounded-full border border-dashed border-[#f5f5f5]" />
-);
-
-const EmptyIcon = () => (
-  <span className="my-1 h-6 w-6 rounded-full border border-neutral-700" />
-);
-
-const FutureIcon = () => (
-  <span className="my-1 h-6 w-6 rounded-full bg-neutral-800" />
-);
-
-const CalendarStatus = ({ type }: CalendarStatusProps) => {
+function CalendarStatus({ type }: CalendarStatusProps) {
   const statusMap = {
     check: CheckIcon,
     uncheck: XIcon,
@@ -54,19 +43,9 @@ const CalendarStatus = ({ type }: CalendarStatusProps) => {
 
   const StatusComponent = statusMap[type];
   return StatusComponent ? <StatusComponent /> : null;
-};
+}
 
-const CalendarItem = ({ date, transaction, type }: CalendarItemProps) => {
-  const getCalendarType = (transaction?: TTransactionRecord) => {
-    if (!transaction) return "empty";
-    if (transaction.consumedMedications === transaction.medicationsToBeConsumed)
-      return "check";
-    if (transaction.skippedMedications > 0) return "uncheck";
-    if (transaction.totalMedications === 0) return "empty";
-    if (transaction.totalMedications > 0) return "pre";
-    return "empty";
-  };
-
+function CalendarItem({ date, transaction, type }: CalendarItemProps) {
   return (
     <div
       className={`flex flex-1 flex-col items-center rounded-2xl p-2 ${
@@ -82,7 +61,7 @@ const CalendarItem = ({ date, transaction, type }: CalendarItemProps) => {
       )}
     </div>
   );
-};
+}
 
 export default function Header({
   transactions,
@@ -111,8 +90,6 @@ export default function Header({
         currentDate,
       };
     }, [transactions]);
-
-  // console.log("render header");
 
   return (
     <header className="flex select-none flex-col gap-2 p-4">

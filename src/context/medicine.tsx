@@ -5,7 +5,6 @@ import {
   DosageForm,
   DosageQty,
   ScheduleCategory,
-  Schedule,
 } from "@/types/medicine";
 import { getCurrentDate } from "@/libs/util";
 
