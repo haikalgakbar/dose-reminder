@@ -11,8 +11,11 @@ import {
   handleMonthNavigation,
   handleDisabled,
   handleTodayClick,
+  handleDateSelection,
+  handleSelectedTransaction,
 } from "@/features/history/util";
 import { CalendarItem } from "@/features/history/calendar-status";
+import { DetailHistory } from "@/features/history/detail-history";
 
 export const Route = createLazyFileRoute("/history")({
   component: History,
@@ -29,32 +32,32 @@ function getDateTransaction(date: Date, transactions: TTransactionRecord[]) {
 function History() {
   const today = getCurrentDate();
 
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    new Date(today),
-  );
-  const [selectedMonth, setSelectedMonth] = useState<Date | undefined>(
-    new Date(today),
-  );
   const [isMounted, setIsMounted] = useState(true);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date(today));
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date(today));
   const [transactions, setTransactions] = useState<TTransactionRecord[] | []>(
     [],
   );
-  const [selectedTransaction, _] = useState<TTransactionRecord[] | []>([]);
+  const [selectedTransaction, setSelectedTransaction] = useState<
+    TTransactionRecord | undefined
+  >(undefined);
 
   useEffect(() => {
     getTransactions().then((res) => {
       if (isMounted) {
         setTransactions(res);
+        handleSelectedTransaction(selectedDate, res, setSelectedTransaction);
       }
     });
 
     return () => {
-      setIsMounted((prev) => !prev);
+      setIsMounted(false);
     };
   }, []);
 
-  if (isMounted || !transactions) return <div>Loading...</div>;
+  if (isMounted || isArrayEmpty(transactions)) return <div>Loading...</div>;
 
+  console.log(selectedTransaction?.id);
   return (
     <>
       <section className="space-y-4 p-4 pb-2 text-neutral-200">
@@ -62,9 +65,12 @@ function History() {
           mode="single"
           selected={selectedDate}
           onSelect={(date) => {
-            if (!selectedDate || (date && date !== selectedDate)) {
-              setSelectedDate(date);
-            }
+            handleDateSelection(date as Date, setSelectedDate, selectedDate);
+            handleSelectedTransaction(
+              date as Date,
+              transactions,
+              setSelectedTransaction,
+            );
           }}
           month={selectedMonth}
           className="rounded-md p-0"
@@ -166,21 +172,36 @@ function History() {
               : format(selectedDate || "", "EEEE, dd MMM yyyy")}
           </h2>
         </header>
-        {isArrayEmpty(selectedTransaction) && (
-          <article className="flex flex-col items-center justify-center gap-2 pb-48 text-neutral-400">
-            <div className="mt-20 w-fit rounded-full bg-neutral-800 p-4">
-              <CalendarCheck2 className="text-white" />
-            </div>
-            <h2 className="text-2xl font-medium text-neutral-200">
-              No medication today
-            </h2>
-            <p>You have no medications scheduled for today.</p>
-          </article>
+        {selectedTransaction ? (
+          selectedTransaction.medications.map((medicine, index) => (
+            <DetailHistory
+              key={index}
+              medicine={medicine}
+              date={selectedTransaction.id}
+            />
+          ))
+        ) : (
+          <EmptyHistory />
         )}
       </section>
     </>
   );
 }
+
+function EmptyHistory() {
+  return (
+    <article className="flex flex-col items-center justify-center gap-2 pb-48 text-neutral-400">
+      <div className="mt-20 w-fit rounded-full bg-neutral-800 p-4">
+        <CalendarCheck2 className="text-white" />
+      </div>
+      <h2 className="text-2xl font-medium text-neutral-200">
+        No medication today
+      </h2>
+      <p>You have no medications scheduled for today.</p>
+    </article>
+  );
+}
+
 
 // function HistoryCard({ medication }: { medication: MedicineTransaction }) {
 //   const renderSchedule = () => {

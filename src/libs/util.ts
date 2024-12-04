@@ -216,31 +216,6 @@ export async function createDailyTransaction() {
   }
 }
 
-// export async function createDailyTransaction() {
-//   const dates = eachDayOfInterval({
-//     start: getItemFromLocalStorage(LAST_LOGIN),
-//     end: getCurrentDate(),
-//   });
-
-//   let previousDate: string | undefined;
-
-//   for (const date of dates) {
-//     if (previousDate) {
-//       await updatePreviousTransaction(previousDate);
-//     }
-
-//     const medications = await getDatas<TMedicine>(DB_NAME, MEDICINE_STORE);
-//     for (const medication of medications) {
-//       if (isMedicineValid(medication, date.toISOString())) {
-//         await processMedicationsForDate(date, medication);
-//       }
-//     }
-
-//     previousDate = date.toISOString();
-//     saveToLocalStorage(LAST_LOGIN, getCurrentDate());
-//   }
-// }
-
 async function updatePreviousTransaction(previousDate: string) {
   const trx = await getDatas<TTransactionRecord>(DB_NAME, TRANSACTION_STORE);
   const prevTrx = trx.filter((item) => item.id === previousDate);
@@ -396,7 +371,6 @@ function categorizeMedsByTime(medications: MedicineTransaction[]) {
 
 export function processMedicines(medicines: MedicineTransaction[]) {
   const sortedCategorizedMeds = categorizeMedsByTime(medicines);
-  // const sortedCategorizedMeds = categorizeMedsByTime(medicines[0].medications);
 
   return {
     takeNow: sortedCategorizedMeds.takeNow as MedicineTransaction[],

@@ -15,37 +15,22 @@ export async function getTransactions() {
 
 export function handleDisabled(
   transactions: TTransactionRecord[],
-  selectedMonth: Date | undefined,
+  selectedMonth: Date,
   type: "prev" | "next",
 ) {
   if (isArrayEmpty(transactions)) return true;
 
-  console.log(
-    new Date(transactions[0].id).getMonth(),
-    selectedMonth?.getMonth(),
-  );
-
   if (type === "prev") {
-    console.log(
-      "prev",
-      new Date(transactions[0].id).getMonth() === selectedMonth?.getMonth(),
-    );
-
     return (
       new Date(transactions[0].id).getMonth() === selectedMonth?.getMonth()
     );
   } else {
-    console.log(
-      "next",
-      new Date(getCurrentDate()).getMonth() === selectedMonth?.getMonth(),
-    );
-
     return new Date(getCurrentDate()).getMonth() === selectedMonth?.getMonth();
   }
 }
 
 export function handleMonthNavigation(
-  setSelectedMonth: Dispatch<SetStateAction<Date | undefined>>,
+  setSelectedMonth: Dispatch<SetStateAction<Date>>,
   type: "prev" | "next",
 ) {
   if (type === "prev") {
@@ -60,11 +45,33 @@ export function handleMonthNavigation(
 }
 
 export function handleTodayClick(
-  setSelectedDate: Dispatch<SetStateAction<Date | undefined>>,
-  setSelectedMonth: Dispatch<SetStateAction<Date | undefined>>,
+  setSelectedDate: Dispatch<SetStateAction<Date>>,
+  setSelectedMonth: Dispatch<SetStateAction<Date>>,
 ) {
   setSelectedDate(new Date(getCurrentDate()));
   setSelectedMonth(new Date(getCurrentDate()));
 }
 
-// export function handle
+export function handleDateSelection(
+  date: Date,
+  setSelectedDate: Dispatch<SetStateAction<Date>>,
+  selectedDate: Date,
+) {
+  if (!selectedDate || (date && date !== selectedDate)) {
+    setSelectedDate(date);
+  }
+}
+
+export function handleSelectedTransaction(
+  date: Date,
+  transactions: TTransactionRecord[],
+  setTransaction: Dispatch<SetStateAction<TTransactionRecord | undefined>>,
+) {
+  if (date) {
+    const trx = transactions.find((trx) => trx.id === date.toISOString());
+    // console.log(date.toISOString(), trx?.id);
+
+    setTransaction(trx);
+  }
+  return undefined;
+}
