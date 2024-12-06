@@ -1,11 +1,14 @@
 import {
+  AsNeededSchedule,
+  DailySchedule,
   DayOfWeek,
   Dosage,
   DosageForm,
   DosageQty,
   Schedule,
   ScheduleCategory,
-} from "./medicine";
+  SpecificDaysSchedule,
+} from "@/types/medicine";
 
 export type TTransactionRecord = {
   id: string; // ISO 8601 date string
@@ -27,6 +30,32 @@ export type MedicineTransaction = {
   timeToConsume: string | null; // Time to consume the medicine, if applicable
   consumedAt: string[]; // Array of times the medicine was consumed
   isSkip: boolean; // Whether the medication was skipped
+};
+
+export type ScheduledMedicine =
+  | { category: ScheduleCategory.DailyIntake; details: DailySchedule }
+  | {
+      category: ScheduleCategory.SpecificDays;
+      details: SpecificDaysSchedule;
+    };
+
+export type AsNeededMedicine = {
+  category: ScheduleCategory.TakeAsNeeded;
+  details: AsNeededSchedule;
+};
+
+export type MedicineTransactionWithSchedule = Omit<
+  MedicineTransaction,
+  "schedule"
+> & {
+  schedule: ScheduledMedicine;
+};
+
+export type MedicineTransactionAsNeeded = Omit<
+  MedicineTransaction,
+  "schedule"
+> & {
+  schedule: AsNeededMedicine;
 };
 
 export const exampleTransaction: TTransactionRecord[] = [
