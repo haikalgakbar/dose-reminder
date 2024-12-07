@@ -19,10 +19,10 @@ function Root() {
   const currentPath = location.pathname;
 
   useEffect(() => {
-    async function test() {
+    async function dailyTransaction() {
       createDailyTransaction();
     }
-    test();
+    dailyTransaction();
   }, []);
 
   return (

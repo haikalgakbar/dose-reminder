@@ -132,29 +132,6 @@ export default function AddMedication({ children }: { children: ReactNode }) {
   );
 }
 
-// const AddMedicineForm = memo(
-//   ({
-//     step,
-//     setStep,
-//     setOpen,
-//     className,
-//   }: {
-//     step: number;
-//     setStep: React.Dispatch<React.SetStateAction<number>>;
-//     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-//     className: string;
-//   }) => {
-//     return (
-//       <div className={className}>
-//         {step === 1 ? (
-//           <StepOneForm setStep={setStep} />
-//         ) : (
-//           <StepTwoForm setOpen={setOpen} />
-//         )}
-//       </div>
-//     );
-//   },
-// );
 function AddMedicineForm({
   step,
   setStep,

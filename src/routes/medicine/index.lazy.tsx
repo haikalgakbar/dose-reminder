@@ -33,8 +33,6 @@ function Medicine() {
         MEDICINE_STORE,
       );
 
-      // console.log(medicines);
-
       if (isArrayEmpty(medicines)) {
         setMedicines(undefined);
         setLoading(false);

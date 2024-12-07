@@ -129,7 +129,6 @@ export function processTransaction(
   id: string,
   medications: MedicineTransaction[],
 ): TTransactionRecord {
-  // const { medications } = transaction[0];
   const totalMedications = medications.length;
   let medicationsToBeConsumed = 0;
   let consumedMedications = 0;

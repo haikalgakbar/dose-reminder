@@ -160,9 +160,6 @@ function History() {
                     transaction={getDateTransaction(date, transactions)}
                   />
                 )}
-                {/* {date <= new Date(today) && (
-                  <div className="h-1 w-1 rounded-full bg-[#FFD2A7]"></div>
-                )} */}
                 {date.getDate()}
               </div>
             ),

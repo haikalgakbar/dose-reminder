@@ -10,27 +10,22 @@ import {
 } from "@/components/ui/dialog";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { ScheduleCategory } from "@/types/medicine";
-import handleTakeMedicine from "@/libs/medicine";
 import {
   MedicineTransaction,
   MedicineTransactionWithSchedule,
   TTransactionRecord,
 } from "@/types/transaction";
-import { Dispatch, memo, SetStateAction, useState } from "react";
-import { Medicine } from "@/routes/index.lazy";
+import { memo, useState } from "react";
 import { CheckIcon, PreIcon, XIcon } from "@/components/calendar-status";
 import { getCurrentDate } from "@/libs/util";
 import { format } from "date-fns";
-import { string, z } from "zod";
+import { z } from "zod";
 import { ArrowLeft, Check, ChevronRight, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -414,23 +409,6 @@ function ChangeStatus({
         </>
       );
   }
-}
-
-function updateMedicines(medicines: Medicine, medicationId: string) {
-  const updatedMedicines = JSON.parse(JSON.stringify(medicines)) as Medicine;
-
-  updatedMedicines.today.withTime = updatedMedicines.today.withTime.map(
-    (time) => ({
-      time: time.time,
-      data: time.data.filter((med) => med.id !== medicationId),
-    }),
-  );
-
-  updatedMedicines.today.withTime = updatedMedicines.today.withTime.filter(
-    (time) => time.data.length > 0,
-  );
-
-  return updatedMedicines;
 }
 
 const DetailMedicineTrigger = memo(
