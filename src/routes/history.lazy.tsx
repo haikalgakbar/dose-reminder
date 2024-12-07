@@ -191,6 +191,7 @@ function History() {
                 key={index}
                 date={selectedTransaction.id}
                 medicine={medicine as MedicineTransactionWithSchedule}
+                transaction={selectedTransaction}
               />
             ),
           )
