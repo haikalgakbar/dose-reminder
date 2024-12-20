@@ -135,7 +135,7 @@ function Home() {
     );
 
   return (
-    <main>
+    <main className="w-full max-w-2xl">
       <Header transactions={medicines!.all} />
       {medicines?.today.withTime.map((item, index) => (
         <section
