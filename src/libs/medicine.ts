@@ -89,5 +89,7 @@ export default function handleTakeMedicine(
     updatedTransaction.medications,
   );
 
+  console.log(transaction);
+
   updateData(DB_NAME, TRANSACTION_STORE, newTransaction);
 }

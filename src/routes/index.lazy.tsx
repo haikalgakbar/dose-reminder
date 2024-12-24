@@ -146,12 +146,14 @@ function Home() {
             <h2 className="text-xl font-medium">{item.time}</h2>
           </header>
           <div className="rounded-xl bg-[#262626]">
-            {item.data.map((med, index) => (
+            {item.data.map((med) => (
               <DetailMedicine
                 key={med.id}
                 medicine={med as unknown as MedicineTransaction}
                 setMedicine={setMedicines}
-                transaction={medicines.all[index]}
+                transaction={
+                  medicines.all.filter((med) => med.id === getCurrentDate())[0]
+                }
               />
             ))}
           </div>
