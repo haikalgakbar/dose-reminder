@@ -20,18 +20,26 @@ export function XIcon() {
   );
 }
 
-export function PreIcon() {
+export function PreIcon({ type }: { type: "home" | "history" }) {
   return (
-    <span className="my-1 h-6 w-6 rounded-full border border-dashed border-[#f5f5f5]" />
+    <span
+      className={`my-1 ${type === "history" ? "h-4 w-4" : "h-6 w-6"} rounded-full border border-dashed border-[#f5f5f5]`}
+    />
   );
 }
 
-export function EmptyIcon() {
+export function EmptyIcon({ type }: { type: "home" | "history" }) {
   return (
-    <span className="my-1 h-6 w-6 rounded-full border border-neutral-700" />
+    <span
+      className={`${type === "history" ? "h-4 w-4" : "h-6 w-6"} my-1 rounded-full border border-neutral-700`}
+    />
   );
 }
 
-export function FutureIcon() {
-  return <span className="my-1 h-6 w-6 rounded-full bg-neutral-800" />;
+export function FutureIcon({ type }: { type: "home" | "history" }) {
+  return (
+    <span
+      className={`${type === "history" ? "h-4 w-4" : "h-6 w-6"} my-1 rounded-full bg-neutral-800`}
+    />
+  );
 }

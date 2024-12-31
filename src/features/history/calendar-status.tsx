@@ -20,7 +20,7 @@ function CalendarStatus({ type }: CalendarStatusProps) {
   };
 
   const StatusComponent = statusMap[type];
-  return StatusComponent ? <StatusComponent /> : null;
+  return StatusComponent ? <StatusComponent type="history" /> : null;
 }
 
 function getCalendarType(transaction: TTransactionRecord | undefined) {
