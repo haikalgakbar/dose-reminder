@@ -28,7 +28,7 @@ function Root() {
   return (
     <>
       {currentPath.startsWith("/medicine/") ? null : (
-        <nav className="fixed bottom-0 flex w-full items-center gap-2 bg-[#171717]/80 backdrop-blur-xl backdrop-brightness-50">
+        <nav className="fixed bottom-0 z-10 flex w-full items-center gap-2 bg-[#171717]/80 backdrop-blur-xl backdrop-brightness-50">
           <ul className="mx-auto flex w-full max-w-2xl items-center p-4">
             <li className="w-full">
               <Link

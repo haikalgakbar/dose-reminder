@@ -1,5 +1,5 @@
 import { Calendar } from "@/components/ui/calendar";
-import { getCurrentDate, isArrayEmpty } from "@/libs/util";
+import { getCurrentDate } from "@/libs/util";
 import {
   MedicineTransactionAsNeeded,
   MedicineTransactionWithSchedule,

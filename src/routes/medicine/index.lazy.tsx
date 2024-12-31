@@ -62,7 +62,7 @@ function Medicine() {
   if (!medicines) return <EmptyMedication />;
 
   return (
-    <main>
+    <main className="flex min-h-screen w-full max-w-xl flex-col">
       <Header meds={medicines} />
       {medicines.map(
         (medicine) =>

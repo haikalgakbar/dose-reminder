@@ -4,6 +4,7 @@ import { useMediaQuery } from "@uidotdev/usehooks";
 import { ReactNode, useState } from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -75,19 +76,28 @@ export default function AddMedication({ children }: { children: ReactNode }) {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="bg-[#1D1B1A]">
-            <Plus size={20} />
-            Add medication
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="border-none bg-neutral-900 p-6 text-neutral-200 sm:max-w-[425px] sm:rounded-2xl">
+          <DialogHeader className="flex-row items-center gap-2">
+            {step !== 1 && (
+              <Button
+                variant="ghost"
+                className="-ms-2 h-8 w-8 rounded-xl p-2 hover:bg-black/5"
+                onClick={() => setStep((prev) => prev - 1)}
+              >
+                <ArrowLeft size={18} className="text-neutral-300" />
+              </Button>
+            )}
+            <DialogTitle className="w-full">New medicine</DialogTitle>
+            <DialogClose className="mt-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+            <DialogDescription className="sr-only">
               Make changes to your profile here. Click save when you're done.
             </DialogDescription>
           </DialogHeader>
+          <AddMedicineForm step={step} setStep={setStep} setOpen={setOpen} />
         </DialogContent>
       </Dialog>
     );
@@ -141,7 +151,7 @@ function AddMedicineForm({
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  className: string;
+  className?: string;
 }) {
   return (
     <div className={className}>
