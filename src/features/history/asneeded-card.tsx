@@ -59,7 +59,15 @@ export function AsNeededCard({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">Edit Profile</Button>
+          <Button
+            variant="ghost"
+            className="flex h-fit w-full items-center justify-between rounded-xl bg-neutral-800 p-4 hover:bg-neutral-700 hover:text-neutral-200"
+          >
+            <>
+              <h3 className="text-base font-medium">{medicine.name}</h3>
+              <p>{`${medicine.consumedAt.length} time(s)`}</p>
+            </>
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

@@ -2,6 +2,7 @@ import { useMediaQuery } from "@uidotdev/usehooks";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -60,16 +61,61 @@ export function ScheduledCard({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline">Edit Profile</Button>
+          <Button
+            variant="ghost"
+            className="flex h-fit w-full items-center justify-between rounded-xl bg-neutral-800 p-4 hover:bg-neutral-700 hover:text-neutral-200"
+          >
+            <DetailMedicineTrigger date={date} medicine={medicine} />
+          </Button>
         </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
-              Make changes to your profile here. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          <h1>Detail</h1>
+        <DialogContent
+          className="border-none bg-neutral-900 p-6 text-neutral-200 sm:max-w-[425px] sm:rounded-2xl"
+          onCloseAutoFocus={() => setContent("detail")}
+        >
+          {content === "detail" ? (
+            <DialogHeader className="flex-row items-center gap-2">
+              <DialogTitle className="w-full">{medicine.name}</DialogTitle>
+              <DialogDescription className="sr-only">
+                Make changes to your profile here. Click save when you're done.
+              </DialogDescription>
+              <DialogClose className="mt-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </DialogClose>
+            </DialogHeader>
+          ) : content === "status" ||
+            content === "time" ||
+            content === "update" ? (
+            <DialogHeader className="text-left">
+              <div className="flex w-full items-center">
+                <Button
+                  variant="ghost"
+                  className="relative z-10 h-8 p-0 before:absolute before:z-0 before:h-8 before:w-8 before:rounded-xl before:content-[''] hover:bg-transparent hover:text-neutral-200 before:hover:bg-neutral-700"
+                  onClick={() => {
+                    if (content === "status") setContent("detail");
+                    if (content === "time") setContent("status");
+                    if (content === "update") setContent("time");
+                  }}
+                >
+                  <ArrowLeft size={20} className="z-10" />
+                </Button>
+                <DialogTitle className="w-full pe-6 text-center text-sm uppercase tracking-wide text-neutral-300">
+                  Status
+                </DialogTitle>
+              </div>
+              <DialogDescription className="sr-only">
+                Make changes to your profile here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+          ) : null}
+          <ChangeStatus
+            type="desktop"
+            date={date}
+            content={content}
+            setContent={setContent}
+            medicine={medicine}
+            transaction={transaction}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -92,7 +138,76 @@ export function ScheduledCard({
         </Button>
       </DrawerTrigger>
       <DrawerContent className="border border-neutral-800 bg-neutral-800/60 text-neutral-200 backdrop-blur-md">
+        {content === "detail" ? (
+          <DrawerHeader className="text-left">
+            <DrawerTitle>{medicine.name}</DrawerTitle>
+            <DrawerDescription className="sr-only">
+              Make changes to your profile here. Click save when you're done.
+            </DrawerDescription>
+          </DrawerHeader>
+        ) : content === "status" ? (
+          <DrawerHeader className="p-2 text-left">
+            <div className="flex w-full items-center px-1">
+              <Button
+                variant="ghost"
+                className="relative z-10 h-8 p-0 before:absolute before:z-0 before:h-8 before:w-8 before:rounded-xl before:content-[''] hover:bg-transparent hover:text-neutral-200 before:hover:bg-neutral-700"
+                onClick={() => {
+                  setContent("detail");
+                }}
+              >
+                <ArrowLeft size={20} className="z-10" />
+              </Button>
+              <DrawerTitle className="w-full pe-8 text-center text-sm uppercase tracking-wide text-neutral-300">
+                Status
+              </DrawerTitle>
+            </div>
+            <DrawerDescription className="sr-only">
+              Make changes to your profile here. Click save when you're done.
+            </DrawerDescription>
+          </DrawerHeader>
+        ) : content === "time" ? (
+          <DrawerHeader className="p-2 text-left">
+            <div className="flex w-full items-center px-1">
+              <Button
+                variant="ghost"
+                className="relative z-10 h-8 p-0 before:absolute before:z-0 before:h-8 before:w-8 before:rounded-xl before:content-[''] hover:bg-transparent hover:text-neutral-200 before:hover:bg-neutral-700"
+                onClick={() => {
+                  setContent("status");
+                }}
+              >
+                <ArrowLeft size={20} className="z-10" />
+              </Button>
+              <DrawerTitle className="w-full pe-8 text-center text-sm uppercase tracking-wide text-neutral-300">
+                Status
+              </DrawerTitle>
+            </div>
+            <DrawerDescription className="sr-only">
+              Make changes to your profile here. Click save when you're done.
+            </DrawerDescription>
+          </DrawerHeader>
+        ) : content === "update" ? (
+          <DrawerHeader className="p-2 text-left">
+            <div className="flex w-full items-center px-1">
+              <Button
+                variant="ghost"
+                className="relative z-10 h-8 p-0 before:absolute before:z-0 before:h-8 before:w-8 before:rounded-xl before:content-[''] hover:bg-transparent hover:text-neutral-200 before:hover:bg-neutral-700"
+                onClick={() => {
+                  setContent("time");
+                }}
+              >
+                <ArrowLeft size={20} className="z-10" />
+              </Button>
+              <DrawerTitle className="w-full pe-8 text-center text-sm uppercase tracking-wide text-neutral-300">
+                Status
+              </DrawerTitle>
+            </div>
+            <DrawerDescription className="sr-only">
+              Make changes to your profile here. Click save when you're done.
+            </DrawerDescription>
+          </DrawerHeader>
+        ) : null}
         <ChangeStatus
+          type="mobile"
           date={date}
           content={content}
           setContent={setContent}
@@ -105,12 +220,14 @@ export function ScheduledCard({
 }
 
 function ChangeStatus({
+  type,
   date,
   content,
   setContent,
   medicine,
   transaction,
 }: {
+  type: "desktop" | "mobile";
   date: string;
   content: "detail" | "status" | "time" | "update";
   setContent: React.Dispatch<
@@ -210,13 +327,7 @@ function ChangeStatus({
     case "detail":
       return (
         <>
-          <DrawerHeader className="text-left">
-            <DrawerTitle>{medicine.name}</DrawerTitle>
-            <DrawerDescription className="sr-only">
-              Make changes to your profile here. Click save when you're done.
-            </DrawerDescription>
-          </DrawerHeader>
-          <section className="space-y-4 p-4 pt-2">
+          <section className={`${type === "mobile" && "p-4"} space-y-4 pt-2`}>
             <article className="rounded-xl bg-neutral-800 p-4">
               {medicine.instruction}
             </article>
@@ -224,26 +335,26 @@ function ChangeStatus({
               <h3>Date</h3>
               <p>{format(date, "dd/MM/yyyy")}</p>
             </article>
-            <article className="flex flex-col gap-2 rounded-xl bg-neutral-800 p-2">
-              <div className="flex w-full items-center justify-between p-2">
+            <article className="flex flex-col rounded-xl bg-neutral-800">
+              <div className="flex w-full items-center justify-between p-4">
                 <h3>Dosage</h3>
                 <p>
                   {medicine.dosage.qty} {medicine.dosage.form}
                 </p>
               </div>
               <div className="h-[1px] w-full rounded-full bg-neutral-700"></div>
-              <div className="flex w-full items-center justify-between p-2">
+              <div className="flex w-full items-center justify-between p-4">
                 <h3>Time</h3>
                 <p>{medicine.timeToConsume}</p>
               </div>
             </article>
-            <article className="flex flex-col gap-2 rounded-xl bg-neutral-800 p-2">
+            <article className="flex flex-col overflow-hidden rounded-xl bg-neutral-800">
               <Button
                 variant="ghost"
                 onClick={() => {
                   setContent("status");
                 }}
-                className="flex cursor-pointer items-center justify-between rounded-lg p-2 text-start font-normal hover:bg-neutral-700 hover:text-neutral-200"
+                className="flex min-h-fit cursor-pointer items-center justify-between rounded-none p-4 text-start font-normal hover:bg-neutral-700 hover:text-neutral-200"
               >
                 <h3 className="w-full text-base font-normal">Status</h3>
                 <p className="me-1 text-base text-neutral-400">
@@ -256,7 +367,7 @@ function ChangeStatus({
                 <ChevronRight size={20} />
               </Button>
               <div className="h-[1px] w-full rounded-full bg-neutral-700"></div>
-              <div className="flex w-full items-center justify-between p-2">
+              <div className="flex w-full items-center justify-between p-4">
                 <h3>Consumed at</h3>
                 <p>{`${medicine.consumedAt[0] ?? "None"}`}</p>
               </div>
@@ -267,26 +378,7 @@ function ChangeStatus({
     case "status":
       return (
         <>
-          <DrawerHeader className="p-2 text-left">
-            <div className="flex w-full items-center px-1">
-              <Button
-                variant="ghost"
-                className="relative z-10 h-8 p-0 before:absolute before:z-0 before:h-8 before:w-8 before:rounded-xl before:content-[''] hover:bg-transparent hover:text-neutral-200 before:hover:bg-neutral-700"
-                onClick={() => {
-                  setContent("detail");
-                }}
-              >
-                <ArrowLeft size={20} className="z-10" />
-              </Button>
-              <DrawerTitle className="w-full pe-8 text-center text-sm uppercase tracking-wide text-neutral-300">
-                Status
-              </DrawerTitle>
-            </div>
-            <DrawerDescription className="sr-only">
-              Make changes to your profile here. Click save when you're done.
-            </DrawerDescription>
-          </DrawerHeader>
-          <section className="flex gap-2 p-4 pt-2">
+          <section className={`${type === "mobile" && "p-4"} flex gap-2 pt-2`}>
             <Button
               onClick={() => {
                 setContent("time");
@@ -309,26 +401,9 @@ function ChangeStatus({
     case "time":
       return (
         <>
-          <DrawerHeader className="p-2 text-left">
-            <div className="flex w-full items-center px-1">
-              <Button
-                variant="ghost"
-                className="relative z-10 h-8 p-0 before:absolute before:z-0 before:h-8 before:w-8 before:rounded-xl before:content-[''] hover:bg-transparent hover:text-neutral-200 before:hover:bg-neutral-700"
-                onClick={() => {
-                  setContent("status");
-                }}
-              >
-                <ArrowLeft size={20} className="z-10" />
-              </Button>
-              <DrawerTitle className="w-full pe-8 text-center text-sm uppercase tracking-wide text-neutral-300">
-                Status
-              </DrawerTitle>
-            </div>
-            <DrawerDescription className="sr-only">
-              Make changes to your profile here. Click save when you're done.
-            </DrawerDescription>
-          </DrawerHeader>
-          <section className="flex flex-col gap-2 p-4 pt-2">
+          <section
+            className={`${type === "mobile" && "p-4"} flex flex-col gap-2 pt-2`}
+          >
             <p className="ms-2">When did you take your meds?</p>
             <Button
               onClick={handleConsumeNowMedicine}
@@ -356,29 +431,10 @@ function ChangeStatus({
     case "update":
       return (
         <>
-          <DrawerHeader className="p-2 text-left">
-            <div className="flex w-full items-center px-1">
-              <Button
-                variant="ghost"
-                className="relative z-10 h-8 p-0 before:absolute before:z-0 before:h-8 before:w-8 before:rounded-xl before:content-[''] hover:bg-transparent hover:text-neutral-200 before:hover:bg-neutral-700"
-                onClick={() => {
-                  setContent("time");
-                }}
-              >
-                <ArrowLeft size={20} className="z-10" />
-              </Button>
-              <DrawerTitle className="w-full pe-8 text-center text-sm uppercase tracking-wide text-neutral-300">
-                Status
-              </DrawerTitle>
-            </div>
-            <DrawerDescription className="sr-only">
-              Make changes to your profile here. Click save when you're done.
-            </DrawerDescription>
-          </DrawerHeader>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6 p-4 pt-2"
+              className={`${type === "mobile" && "p-4"} space-y-6 pt-2`}
             >
               <FormField
                 control={form.control}
@@ -418,7 +474,8 @@ const DetailMedicineTrigger = memo(
 
       if (medicine.consumedAt.length > 0) return <CheckIcon />;
       if (medicine.isSkip) return <XIcon />;
-      if (isToday && !medicine.consumedAt.length) return <PreIcon />;
+      if (isToday && !medicine.consumedAt.length)
+        return <PreIcon type="history" />;
       return null;
     }
 
