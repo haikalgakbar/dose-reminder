@@ -63,6 +63,8 @@ function History() {
 
   if (isMounted) return <div>Loading...</div>;
 
+  console.log(selectedTransaction);
+
   return (
     <main className="flex min-h-screen w-full max-w-xl flex-col">
       <section className="w-full space-y-4 p-4 pb-2 text-neutral-200">

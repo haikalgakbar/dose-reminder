@@ -78,6 +78,7 @@ export default function handleTakeMedicine(
         return {
           ...med,
           consumedAt: [...med.consumedAt, format(new Date(), "HH:mm")],
+          isSkip: false,
         };
       }
       return med;
