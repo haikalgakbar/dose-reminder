@@ -64,7 +64,7 @@ function History() {
   // if (isMounted || isArrayEmpty(transactions)) return <div>Loading...</div>;
 
   return (
-    <>
+    <main className="flex min-h-screen w-full max-w-xl flex-col">
       <section className="w-full space-y-4 p-4 pb-2 text-neutral-200">
         <Calendar
           mode="single"
@@ -78,8 +78,9 @@ function History() {
             );
           }}
           month={selectedMonth}
-          className="rounded-md p-0"
+          className="w-full rounded-md p-0"
           classNames={{
+            months: "sm:flex-col",
             day_today: "border border-neutral-200",
             row: "flex w-full mt-1 gap-1",
             cell: "w-full p-0 relative [&:has([aria-selected].day-outside)]:bg-accent/50 focus-within:relative focus-within:z-20 rounded-xl aspect-square justify-center flex items-center [&:has([aria-selected])]:bg-neutral-200",
@@ -164,105 +165,6 @@ function History() {
             ),
           }}
         />
-        {/* <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={(date) => {
-            handleDateSelection(date as Date, setSelectedDate, selectedDate);
-            handleSelectedTransaction(
-              date as Date,
-              transactions,
-              setSelectedTransaction,
-            );
-          }}
-          month={selectedMonth}
-          className="rounded-md p-0"
-          classNames={{
-            day_today: "border border-neutral-200",
-            row: "flex w-full mt-1 gap-1",
-            cell: "w-full p-0 relative [&:has([aria-selected].day-outside)]:bg-accent/50 focus-within:relative focus-within:z-20 rounded-xl aspect-square justify-center flex items-center [&:has([aria-selected])]:bg-neutral-200",
-            head_row: "flex gap-1",
-            head_cell:
-              "text-neutral-400 w-full font-normal text-sm bg-neutral-800 rounded-full",
-            day: "w-full h-full p-0 font-normal aria-selected:opacity-90 bg-neutral-800 rounded-xl hover:bg-neutral-700 hover:text-white aria-selected:text-neutral-900 aria-selected:bg-neutral-200",
-            day_selected: "bg-neutral-200 text-neutral-900",
-          }}
-          weekStartsOn={1}
-          showOutsideDays={false}
-          formatters={{
-            formatWeekdayName: (date, options) => format(date, "EEE", options),
-            formatCaption: (date, options) =>
-              format(date, "MMM  yyyy", options),
-          }}
-          components={{
-            Caption: ({ displayMonth }) => (
-              <div className="flex w-full items-center justify-between">
-                <div className="text-lg font-medium text-[#f5f5f5]">
-                  {displayMonth.toLocaleDateString("en-US", {
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={`h-fit rounded-lg px-4 py-2 text-base font-normal text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200 ${selectedDate?.toISOString() === today && selectedMonth?.toISOString() === today && "hidden"}`}
-                    onClick={() =>
-                      handleTodayClick(setSelectedDate, setSelectedMonth)
-                    }
-                  >
-                    Today
-                  </Button>
-                  <div className="flex">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-lg p-2 text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200"
-                      onClick={() =>
-                        handleMonthNavigation(setSelectedMonth, "prev")
-                      }
-                      // disabled={true}
-                      disabled={handleDisabled(
-                        transactions,
-                        selectedMonth,
-                        "prev",
-                      )}
-                    >
-                      <ChevronLeft className="h-4 w-4 shrink-0" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="rounded-lg p-2 text-neutral-200 hover:bg-neutral-800 hover:text-neutral-200"
-                      onClick={() =>
-                        handleMonthNavigation(setSelectedMonth, "next")
-                      }
-                      disabled={handleDisabled(
-                        transactions,
-                        selectedMonth,
-                        "next",
-                      )}
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ),
-            DayContent: ({ date }) => (
-              <div className="flex flex-col items-center">
-                {date <= new Date(today) && (
-                  <CalendarItem
-                    key={date.toISOString()}
-                    transaction={getDateTransaction(date, transactions)}
-                  />
-                )}
-                {date.getDate()}
-              </div>
-            ),
-          }}
-        /> */}
       </section>
       <section className="flex h-full flex-col gap-2 p-4 text-neutral-200">
         <header>
@@ -294,7 +196,7 @@ function History() {
           <EmptyHistory />
         )}
       </section>
-    </>
+    </main>
   );
 }
 

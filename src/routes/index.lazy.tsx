@@ -120,16 +120,18 @@ function Home() {
     medicines?.today.withTime.length === 0
   )
     return (
-      <main className="flex min-h-screen flex-col">
+      <main className="flex min-h-screen w-full max-w-xl flex-col">
         <Header transactions={medicines!.all} />
-        <section className="flex flex-1 flex-col items-center justify-center gap-2 pb-48 text-neutral-400">
+        <section className="flex flex-1 flex-col items-center justify-center gap-2 p-4 pb-48 text-neutral-400">
           <div className="h-full w-fit rounded-full bg-neutral-800 p-4">
             <Apple className="text-white" />
           </div>
           <h2 className="text-2xl font-medium text-neutral-200">
             Your schedule is clear
           </h2>
-          <p>Remember to rest or add new medication if necessary.</p>
+          <p className="text-center">
+            Remember to rest or add new medication if necessary.
+          </p>
         </section>
       </main>
     );

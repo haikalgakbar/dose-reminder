@@ -42,7 +42,7 @@ function CalendarStatus({ type }: CalendarStatusProps) {
   };
 
   const StatusComponent = statusMap[type];
-  return StatusComponent ? <StatusComponent /> : null;
+  return StatusComponent ? <StatusComponent type="home" /> : null;
 }
 
 function CalendarItem({ date, transaction, type }: CalendarItemProps) {
@@ -55,7 +55,7 @@ function CalendarItem({ date, transaction, type }: CalendarItemProps) {
       <p className="text-sm text-[#D4D4D4]">{format(date, "EEEEEE")}</p>
       <p className="text-xl font-medium text-[#F5F5F5]">{format(date, "dd")}</p>
       {type === "future" ? (
-        <FutureIcon />
+        <FutureIcon type="home" />
       ) : (
         <CalendarStatus type={getCalendarType(transaction)} />
       )}

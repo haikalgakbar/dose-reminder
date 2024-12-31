@@ -107,7 +107,7 @@ function Medicine() {
 function EmptyMedication() {
   return (
     <main className="flex min-h-screen items-center justify-center">
-      <section className="flex flex-col items-center text-neutral-200">
+      <section className="flex flex-col items-center p-4 text-neutral-200">
         <div className="relative w-fit rounded-full bg-neutral-800 p-4">
           <Pill className="text-neutral-200" />
           <div className="absolute bottom-0 right-0 rounded-full bg-neutral-200 p-1 text-neutral-800">
@@ -119,7 +119,7 @@ function EmptyMedication() {
             Your medication list is empty
           </h2>
         </header>
-        <p className="mb-4 mt-2">
+        <p className="mb-4 mt-2 text-center">
           Easily manage your health by adding your first medication.
         </p>
         <MedicineProvider>
