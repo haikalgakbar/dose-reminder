@@ -1,7 +1,8 @@
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -9,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, X } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -52,28 +53,7 @@ export default function Dosage({
         <h2 className="ms-4">Dosage</h2>
       </header>
       <div className="overflow-hidden rounded-xl bg-neutral-800">
-        <DosageQtyEdit medicine={medicine} setMedicine={setMedicine} />
-        <DosageFormEdit medicine={medicine} setMedicine={setMedicine} />
-      </div>
-    </section>
-  );
-}
-
-function DosageQtyEdit({
-  medicine,
-  setMedicine,
-}: {
-  medicine: TMedicine;
-  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
-}) {
-  const [open, setOpen] = useState(false);
-
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
+        <DosageQtyEdit medicine={medicine} setMedicine={setMedicine}>
           <Button
             variant="ghost"
             className="flex h-fit w-full items-center justify-between gap-1 rounded-none border-b border-b-neutral-700 bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
@@ -86,14 +66,59 @@ function DosageQtyEdit({
               <ChevronRight size={20} />
             </div>
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
+        </DosageQtyEdit>
+        <DosageFormEdit medicine={medicine} setMedicine={setMedicine}>
+          <Button
+            variant="ghost"
+            className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
+          >
+            <h3 className="text-base font-normal">Form</h3>
+            <div className="flex items-center gap-1">
+              <p className="text-base font-normal text-neutral-300">
+                {medicine.dosage.form}
+              </p>
+              <ChevronRight size={20} />
+            </div>
+          </Button>
+        </DosageFormEdit>
+      </div>
+    </section>
+  );
+}
+
+function DosageQtyEdit({
+  medicine,
+  setMedicine,
+  children,
+}: {
+  medicine: TMedicine;
+  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (isDesktop) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="max-w-96 rounded-xl border-0 bg-neutral-900 text-neutral-200 focus:outline-none focus:ring-0">
+          <DialogHeader className="flex-row items-center gap-2">
+            <DialogTitle className="w-full">Edit qty</DialogTitle>
+            <DialogDescription className="sr-only">
               Make changes to your profile here. Click save when you're done.
             </DialogDescription>
+            <DialogClose className="mt-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
           </DialogHeader>
+          <FormQty
+            setOpen={setOpen}
+            medicine={medicine}
+            setMedicine={setMedicine}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -101,20 +126,7 @@ function DosageQtyEdit({
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex h-fit w-full items-center justify-between gap-1 rounded-none border-b border-b-neutral-700 bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
-        >
-          <h3 className="text-base font-normal">Qty</h3>
-          <div className="flex items-center gap-1">
-            <p className="text-base font-normal text-neutral-300">
-              {medicine.dosage.qty}
-            </p>
-            <ChevronRight size={20} />
-          </div>
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="p-4">
         <DrawerTitle className="sr-only w-full text-center text-base uppercase text-[#A3A3A3]">
           Change start date
@@ -213,9 +225,11 @@ function FormQty({
 function DosageFormEdit({
   medicine,
   setMedicine,
+  children,
 }: {
   medicine: TMedicine;
   setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
+  children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -224,27 +238,23 @@ function DosageFormEdit({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
-          >
-            <h3 className="text-base font-normal">Form</h3>
-            <div className="flex items-center gap-1">
-              <p className="text-base font-normal text-neutral-300">
-                {medicine.dosage.form}
-              </p>
-              <ChevronRight size={20} />
-            </div>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="max-w-96 rounded-xl border-0 bg-neutral-900 text-neutral-200 focus:outline-none focus:ring-0">
+          <DialogHeader className="flex-row items-center gap-2">
+            <DialogTitle className="w-full">Edit dosage form</DialogTitle>
+            <DialogDescription className="sr-only">
               Make changes to your profile here. Click save when you're done.
             </DialogDescription>
+            <DialogClose className="mt-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
           </DialogHeader>
+          <DosageFormForm
+            setOpen={setOpen}
+            medicine={medicine}
+            setMedicine={setMedicine}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -252,23 +262,10 @@ function DosageFormEdit({
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
-        >
-          <h3 className="text-base font-normal">Form</h3>
-          <div className="flex items-center gap-1">
-            <p className="text-base font-normal text-neutral-300">
-              {medicine.dosage.form}
-            </p>
-            <ChevronRight size={20} />
-          </div>
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="p-4">
         <DrawerTitle className="sr-only w-full text-center text-base uppercase text-[#A3A3A3]">
-          Change end date
+          Edit dosage form
         </DrawerTitle>
         <DialogDescription className="sr-only">
           Change end date
@@ -323,7 +320,7 @@ function DosageFormForm({
           render={({ field }) => (
             <FormItem className="[">
               <FormLabel className="font-normal text-neutral-300">
-                End date
+                Dosage form
               </FormLabel>
               <FormControl>
                 <Select
