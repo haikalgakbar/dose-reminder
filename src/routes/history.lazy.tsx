@@ -63,8 +63,6 @@ function History() {
 
   if (isMounted) return <div>Loading...</div>;
 
-  console.log(selectedTransaction);
-
   return (
     <main className="flex min-h-screen w-full max-w-xl flex-col">
       <section className="w-full space-y-4 p-4 pb-2 text-neutral-200">
@@ -168,7 +166,7 @@ function History() {
           }}
         />
       </section>
-      <section className="flex h-full flex-col gap-2 p-4 text-neutral-200">
+      <section className="flex h-full flex-col gap-2 p-4 pb-32 text-neutral-200">
         <header>
           <h2 className="font-medium">
             {selectedDate?.getDate() === new Date(today).getDate()

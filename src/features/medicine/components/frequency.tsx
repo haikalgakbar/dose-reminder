@@ -129,9 +129,18 @@ function FrequencyForm({
     return (
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <Button variant="outline" className="bg-[#1D1B1A]">
-            {/* <Plus size={20} /> */}
-            Add medication
+          <Button
+            variant="ghost"
+            className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
+          >
+            <h3 className="text-base font-normal">
+              {medicine.schedule.category === ScheduleCategory.DailyIntake
+                ? "Daily"
+                : medicine.schedule.category === ScheduleCategory.SpecificDays
+                  ? `Every ${medicine.schedule.details.days.join(", ")}`
+                  : "As needed"}
+            </h3>
+            <ChevronRight size={20} />
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
