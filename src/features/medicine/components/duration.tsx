@@ -1,7 +1,8 @@
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -9,7 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, CalendarIcon } from "lucide-react";
+import { ChevronRight, CalendarIcon, X } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -53,28 +54,7 @@ export default function Duration({
         <h2 className="ms-4">Duration</h2>
       </header>
       <div className="overflow-hidden rounded-xl bg-neutral-800">
-        <DurationStartEdit medicine={medicine} setMedicine={setMedicine} />
-        <DurationEndEdit medicine={medicine} setMedicine={setMedicine} />
-      </div>
-    </section>
-  );
-}
-
-function DurationStartEdit({
-  medicine,
-  setMedicine,
-}: {
-  medicine: TMedicine;
-  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
-}) {
-  const [open, setOpen] = useState(false);
-
-  const isDesktop = useMediaQuery("(min-width: 768px)");
-
-  if (isDesktop) {
-    return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
+        <DurationStartEdit medicine={medicine} setMedicine={setMedicine}>
           <Button
             variant="ghost"
             className="flex h-fit w-full items-center justify-between gap-1 rounded-none border-b border-b-neutral-700 bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
@@ -87,14 +67,61 @@ function DurationStartEdit({
               <ChevronRight size={20} />
             </div>
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
+        </DurationStartEdit>
+        <DurationEndEdit medicine={medicine} setMedicine={setMedicine}>
+          <Button
+            variant="ghost"
+            className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
+          >
+            <h3 className="text-base font-normal">End</h3>
+            <div className="flex items-center gap-1">
+              <p className="text-base font-normal text-neutral-300">
+                {medicine.duration.endDate
+                  ? format(new Date(medicine.duration.endDate), "dd MMM yyyy")
+                  : "None"}
+              </p>
+              <ChevronRight size={20} />
+            </div>
+          </Button>
+        </DurationEndEdit>
+      </div>
+    </section>
+  );
+}
+
+function DurationStartEdit({
+  medicine,
+  setMedicine,
+  children,
+}: {
+  medicine: TMedicine;
+  setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
+  children: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (isDesktop) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="max-w-96 rounded-xl border-0 bg-neutral-900 text-neutral-200 focus:outline-none focus:ring-0">
+          <DialogHeader className="flex-row items-center gap-2">
+            <DialogTitle className="w-full">Edit start date</DialogTitle>
+            <DialogDescription className="sr-only">
               Make changes to your profile here. Click save when you're done.
             </DialogDescription>
+            <DialogClose className="mt-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
           </DialogHeader>
+          <FormStart
+            setOpen={setOpen}
+            medicine={medicine}
+            setMedicine={setMedicine}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -102,20 +129,7 @@ function DurationStartEdit({
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex h-fit w-full items-center justify-between gap-1 rounded-none border-b border-b-neutral-700 bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
-        >
-          <h3 className="text-base font-normal">Start</h3>
-          <div className="flex items-center gap-1">
-            <p className="text-base font-normal text-neutral-300">
-              {format(new Date(medicine.duration.startDate), "dd MMM yyyy")}
-            </p>
-            <ChevronRight size={20} />
-          </div>
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="p-4">
         <DrawerTitle className="sr-only w-full text-center text-base uppercase text-[#A3A3A3]">
           Change start date
@@ -240,9 +254,11 @@ function FormStart({
 function DurationEndEdit({
   medicine,
   setMedicine,
+  children,
 }: {
   medicine: TMedicine;
   setMedicine: React.Dispatch<React.SetStateAction<TMedicine | undefined>>;
+  children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -251,29 +267,23 @@ function DurationEndEdit({
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button
-            variant="ghost"
-            className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
-          >
-            <h3 className="text-base font-normal">End</h3>
-            <div className="flex items-center gap-1">
-              <p className="text-base font-normal text-neutral-300">
-                {medicine.duration.endDate
-                  ? format(new Date(medicine.duration.endDate), "dd MMM yyyy")
-                  : "None"}
-              </p>
-              <ChevronRight size={20} />
-            </div>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="max-w-96 rounded-xl border-0 bg-neutral-900 text-neutral-200 focus:outline-none focus:ring-0">
+          <DialogHeader className="flex-row items-center gap-2">
+            <DialogTitle className="w-full">Edit end date</DialogTitle>
+            <DialogDescription className="sr-only">
               Make changes to your profile here. Click save when you're done.
             </DialogDescription>
+            <DialogClose className="mt-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
           </DialogHeader>
+          <FormEnd
+            setOpen={setOpen}
+            medicine={medicine}
+            setMedicine={setMedicine}
+          />
         </DialogContent>
       </Dialog>
     );
@@ -281,22 +291,7 @@ function DurationEndEdit({
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
-      <DrawerTrigger asChild>
-        <Button
-          variant="ghost"
-          className="flex h-fit w-full items-center justify-between gap-1 rounded-none bg-[#1D1B1A] bg-transparent p-4 text-[#F8F4F2] hover:bg-neutral-700/60 hover:text-neutral-200"
-        >
-          <h3 className="text-base font-normal">End</h3>
-          <div className="flex items-center gap-1">
-            <p className="text-base font-normal text-neutral-300">
-              {medicine.duration.endDate
-                ? format(new Date(medicine.duration.endDate), "dd MMM yyyy")
-                : "None"}
-            </p>
-            <ChevronRight size={20} />
-          </div>
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="p-4">
         <DrawerTitle className="sr-only w-full text-center text-base uppercase text-[#A3A3A3]">
           Change end date

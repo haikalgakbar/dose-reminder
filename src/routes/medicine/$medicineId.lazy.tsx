@@ -101,7 +101,7 @@ function MedicineDetail() {
                 <Button
                   type="submit"
                   onClick={() => handleSuspendMedicine(medicine, setMedicine)}
-                  className="bg-neutral-200 text-neutral-800 hover:bg-neutral-400"
+                  className="bg-neutral-200 text-neutral-900 hover:bg-neutral-400"
                 >
                   {medicine.status === "active" ? "Suspend" : "Resume"}
                 </Button>
@@ -124,7 +124,7 @@ function MedicineDetail() {
                 <h3>Delete</h3>
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-96 rounded-xl border-0 bg-neutral-800 text-neutral-200 focus:outline-none focus:ring-0">
+            <DialogContent className="max-w-96 rounded-xl border-0 bg-neutral-900 text-neutral-200 focus:outline-none focus:ring-0">
               <DialogHeader className="gap-1">
                 <DialogTitle>Delete medicine?</DialogTitle>
                 <DialogDescription className="text-neutral-400">
