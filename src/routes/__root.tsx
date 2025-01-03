@@ -1,3 +1,4 @@
+import { useEffect, Suspense } from "react";
 import { createDailyTransaction } from "@/libs/util";
 import {
   createRootRoute,
@@ -5,10 +6,9 @@ import {
   Outlet,
   useLocation,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { CircleCheckBig, Pill, History } from "lucide-react";
-import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
+import { TanStackRouterDevtools } from "@/components/tanstackrouter-devtools";
 
 export const Route = createRootRoute({
   component: Root,
@@ -75,7 +75,9 @@ function Root() {
       )}
       <Outlet />
       <Toaster />
-      <TanStackRouterDevtools />
+      <Suspense>
+        <TanStackRouterDevtools />
+      </Suspense>
     </>
   );
 }
