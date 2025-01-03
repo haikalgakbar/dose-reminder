@@ -1,46 +1,80 @@
 import { createDailyTransaction } from "@/libs/util";
-import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+  createRootRoute,
+  Link,
+  Outlet,
+  useLocation,
+} from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import { CircleCheckBig, Pill, History } from "lucide-react";
 import { useEffect } from "react";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRoute({
   component: Root,
 });
 
 function Root() {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
   useEffect(() => {
-    async function test() {
+    async function dailyTransaction() {
       createDailyTransaction();
     }
-    test();
+
+    dailyTransaction();
   }, []);
 
   return (
     <>
-      <div className="before:from-bg-slate-100/70 fixed bottom-0 flex h-6 w-full items-center justify-center bg-white/70 bg-gradient-to-t from-white/70 to-transparent backdrop-blur-3xl before:fixed before:h-6 before:w-full before:-translate-y-full before:bg-gradient-to-t before:backdrop-blur-3xl before:content-['']">
-        <nav className="m-2 flex w-fit -translate-y-6 gap-2 rounded-2xl border border-slate-100 bg-[#F8F4F2] p-1 text-[#AA9C87] shadow-[0px_8px_16px_0px_rgba(40,37,35,0.2)] backdrop-blur-3xl">
-          <Link
-            to="/"
-            className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl [&.active]:bg-white/70 [&.active]:text-[#F96C00]"
-          >
-            <CircleCheckBig size={20} />
-          </Link>
-          <Link
-            to="/medicine"
-            className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl [&.active]:bg-white/70 [&.active]:text-[#F96C00]"
-          >
-            <Pill size={20} />
-          </Link>
-          <Link
-            to="/history"
-            className="relative flex h-10 w-10 items-center justify-center overflow-hidden rounded-xl [&.active]:bg-white/70 [&.active]:text-[#F96C00]"
-          >
-            <History size={20} />
-          </Link>
+      {currentPath.startsWith("/medicine/") ? null : (
+        <nav className="fixed bottom-0 z-10 flex w-full items-center gap-2 bg-[#171717]/80 backdrop-blur-xl backdrop-brightness-50">
+          <ul className="mx-auto flex w-full max-w-2xl items-center p-4">
+            <li className="w-full">
+              <Link
+                to="/"
+                className="group flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl text-[#f5f5f5]"
+              >
+                <span
+                  className={`rounded-full px-4 py-1 ${currentPath === "/" ? "bg-[#F5F5F5] text-[#171717]" : "text-[#D4D4D4] group-hover:bg-[#404040]"}`}
+                >
+                  <CircleCheckBig size={20} />
+                </span>
+                <span>Check-in</span>
+              </Link>
+            </li>
+            <li className="w-full">
+              <Link
+                to="/medicine"
+                className="group flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl text-[#f5f5f5]"
+              >
+                <span
+                  className={`rounded-full px-4 py-1 ${currentPath === "/medicine" ? "bg-[#F5F5F5] text-[#171717]" : "text-[#D4D4D4] group-hover:bg-[#404040]"}`}
+                >
+                  <Pill size={20} />
+                </span>
+                <span>Medicine</span>
+              </Link>
+            </li>
+            <li className="w-full">
+              <Link
+                to="/history"
+                className="group flex w-full flex-col items-center justify-center gap-1 overflow-hidden rounded-xl text-[#f5f5f5]"
+              >
+                <span
+                  className={`rounded-full px-4 py-1 ${currentPath === "/history" ? "bg-[#F5F5F5] text-[#171717]" : "text-[#D4D4D4] group-hover:bg-[#404040]"}`}
+                >
+                  <History size={20} />
+                </span>
+                <span>History</span>
+              </Link>
+            </li>
+          </ul>
         </nav>
-      </div>
+      )}
       <Outlet />
+      <Toaster />
       <TanStackRouterDevtools />
     </>
   );

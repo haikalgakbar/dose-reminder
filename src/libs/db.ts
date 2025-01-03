@@ -17,16 +17,6 @@ export async function initDB(name: string, store: string) {
   });
 }
 
-// export async function saveToDB(name: string, store: string, item: any) {
-//   const db = await initDB(name, store);
-//   const tx = db.transaction(store, "readwrite");
-//   if (!item.id) {
-//     throw new Error("Item must have an 'id' property.");
-//   }
-//   await tx.objectStore(store).add(item);
-//   await tx.done;
-// }
-
 export async function saveToDB<T extends { id: string }>(
   name: string,
   store: string,
@@ -60,58 +50,6 @@ export async function getData<T>(
   await tx.done;
   return data;
 }
-
-// export async function updateData(
-//   name: string,
-//   store: string,
-//   id?: IDBValidKey,
-//   updates: Partial<any>,
-// ) {
-//   const db = await initDB(name, store);
-//   const tx = db.transaction(store, "readwrite");
-//   const objectStore = tx.objectStore(store);
-
-//   if (id) {
-//     const data = await objectStore.get(id);
-
-//     if (!data) throw new Error(`item with id: ${id} not found.`);
-
-//     const updateData = { ...data, ...updates };
-
-//     await objectStore.put(updateData);
-//     await tx.done;
-//     return;
-//   } else {
-//     await objectStore.put(updates);
-//     await tx.done;
-//   }
-// }
-
-// export async function updateData(
-//   name: string,
-//   store: string,
-//   updates: Partial<any>,
-//   id?: IDBValidKey,
-// ) {
-//   const db = await initDB(name, store);
-//   const tx = db.transaction(store, "readwrite");
-//   const objectStore = tx.objectStore(store);
-
-//   if (id !== undefined && id !== null) {
-//     const data = await objectStore.get(id);
-
-//     if (!data) {
-//       throw new Error(`Item with id: ${id} not found.`);
-//     }
-
-//     const updatedData = { ...data, ...updates };
-//     await objectStore.put(updatedData);
-//   } else {
-//     await objectStore.put(updates);
-//   }
-
-//   await tx.done;
-// }
 
 export async function updateData<T extends TMedicine | TTransactionRecord>(
   name: string,

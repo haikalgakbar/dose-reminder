@@ -1,9 +1,10 @@
 import { defaultMedicine } from "@/context/medicine";
 import useMedicineContext from "@/hooks/useMedicineContext";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -11,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, CalendarIcon, Plus, Trash } from "lucide-react";
+import { ArrowLeft, CalendarIcon, Plus, X } from "lucide-react";
 import {
   Drawer,
   DrawerContent,
@@ -65,7 +66,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { nanoid } from "nanoid";
 import { addMedicine } from "@/libs/medicine";
 
-export default function AddMedication() {
+export default function AddMedication({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(1);
   const { updateMedicine } = useMedicineContext();
@@ -75,19 +76,28 @@ export default function AddMedication() {
   if (isDesktop) {
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="bg-[#1D1B1A]">
-            <Plus size={20} />
-            Add medication
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
-            <DialogDescription>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <DialogContent className="border-none bg-neutral-900 p-6 text-neutral-200 sm:max-w-[425px] sm:rounded-2xl">
+          <DialogHeader className="flex-row items-center gap-2">
+            {step !== 1 && (
+              <Button
+                variant="ghost"
+                className="-ms-2 h-8 w-8 rounded-xl p-2 hover:bg-black/5"
+                onClick={() => setStep((prev) => prev - 1)}
+              >
+                <ArrowLeft size={18} className="text-neutral-300" />
+              </Button>
+            )}
+            <DialogTitle className="w-full">New medicine</DialogTitle>
+            <DialogClose className="mt-0 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+              <X className="h-4 w-4" />
+              <span className="sr-only">Close</span>
+            </DialogClose>
+            <DialogDescription className="sr-only">
               Make changes to your profile here. Click save when you're done.
             </DialogDescription>
           </DialogHeader>
+          <AddMedicineForm step={step} setStep={setStep} setOpen={setOpen} />
         </DialogContent>
       </Dialog>
     );
@@ -102,15 +112,7 @@ export default function AddMedication() {
         setStep(1);
       }}
     >
-      <DrawerTrigger asChild>
-        <Button
-          variant="outline"
-          className="flex items-center gap-1 rounded-lg bg-[#1D1B1A] text-[#F8F4F2]"
-        >
-          <Plus size={20} />
-          Add medication
-        </Button>
-      </DrawerTrigger>
+      <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent>
         <DrawerHeader className="gap-0">
           {step !== 1 && (
@@ -119,11 +121,11 @@ export default function AddMedication() {
               className="-ms-2 h-10 w-10 rounded-xl p-2 hover:bg-black/5"
               onClick={() => setStep((prev) => prev - 1)}
             >
-              <ArrowLeft size={18} className="text-[#33302E]" />
+              <ArrowLeft size={18} className="text-neutral-300" />
             </Button>
           )}
           <DrawerTitle
-            className={`${step !== 1 && "pe-8"} w-full text-center text-base uppercase text-[#635d5a]`}
+            className={`${step !== 1 && "pe-8"} w-full text-center text-base uppercase text-[#A3A3A3]`}
           >
             New medicine
           </DrawerTitle>
@@ -140,29 +142,6 @@ export default function AddMedication() {
   );
 }
 
-// const AddMedicineForm = memo(
-//   ({
-//     step,
-//     setStep,
-//     setOpen,
-//     className,
-//   }: {
-//     step: number;
-//     setStep: React.Dispatch<React.SetStateAction<number>>;
-//     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-//     className: string;
-//   }) => {
-//     return (
-//       <div className={className}>
-//         {step === 1 ? (
-//           <StepOneForm setStep={setStep} />
-//         ) : (
-//           <StepTwoForm setOpen={setOpen} />
-//         )}
-//       </div>
-//     );
-//   },
-// );
 function AddMedicineForm({
   step,
   setStep,
@@ -172,7 +151,7 @@ function AddMedicineForm({
   step: number;
   setStep: React.Dispatch<React.SetStateAction<number>>;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  className: string;
+  className?: string;
 }) {
   return (
     <div className={className}>
@@ -202,7 +181,6 @@ function StepOneForm({
       }),
       duration: z.object({
         startDate: z.string(),
-        // endDate: z.nullable(z.string()),
         endDate: z.string().optional(),
       }),
       addEndDate: z.boolean().default(false).optional(),
@@ -240,7 +218,6 @@ function StepOneForm({
         form: values.dosage.form,
       },
       duration: {
-        // startDate: values.duration.startDate,
         startDate: new Date(values.duration.startDate).toISOString(),
         endDate: values.addEndDate ? values.duration.endDate : undefined,
       },
@@ -248,8 +225,6 @@ function StepOneForm({
 
     setStep((prev) => prev + 1);
   }
-
-  console.log(form.getValues().duration);
 
   return (
     <Form {...form}>
@@ -262,9 +237,14 @@ function StepOneForm({
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-normal text-[#AA9C87]">Name</FormLabel>
+              <FormLabel className="font-normal text-neutral-300">
+                Name
+              </FormLabel>
               <FormControl>
-                <Input className="rounded-lg border-none" {...field} />
+                <Input
+                  className="rounded-lg border-none bg-neutral-800 text-neutral-200"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -275,13 +255,13 @@ function StepOneForm({
           name="instruction"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="font-normal text-[#AA9C87]">
+              <FormLabel className="font-normal text-neutral-300">
                 Instruction
               </FormLabel>
               <FormControl>
                 <Textarea
                   placeholder="At least 30 minutes before eating"
-                  className="resize-none rounded-lg border-none placeholder:text-[#33302E]/50"
+                  className="resize-none rounded-lg border-none bg-neutral-800 text-neutral-200 placeholder:text-neutral-500"
                   {...field}
                 />
               </FormControl>
@@ -290,7 +270,7 @@ function StepOneForm({
           )}
         />
         <div className="grid gap-2">
-          <p className="text-sm font-normal leading-none text-[#AA9C87] peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+          <p className="text-sm font-normal leading-none text-neutral-300 peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {" "}
             How many meds do you take at the same time?
           </p>
@@ -305,12 +285,16 @@ function StepOneForm({
                       onValueChange={field.onChange}
                       defaultValue={field.value.toString()}
                     >
-                      <SelectTrigger className="rounded-lg border-none text-[#33302E]">
+                      <SelectTrigger className="rounded-lg border-none bg-neutral-800 text-neutral-200">
                         <SelectValue placeholder="Select dosage" />
                       </SelectTrigger>
-                      <SelectContent className="border-none">
+                      <SelectContent className="border-none bg-neutral-800 text-neutral-200">
                         {Object.values(DosageQty).map((qty) => (
-                          <SelectItem key={qty} value={qty}>
+                          <SelectItem
+                            key={qty}
+                            value={qty}
+                            className="focus:bg-neutral-700 focus:text-neutral-100"
+                          >
                             {qty}
                           </SelectItem>
                         ))}
@@ -331,12 +315,16 @@ function StepOneForm({
                       onValueChange={field.onChange}
                       defaultValue={field.value.toString()}
                     >
-                      <SelectTrigger className="w-full rounded-lg border-none text-[#33302E]">
+                      <SelectTrigger className="w-full rounded-lg border-none bg-neutral-800 text-neutral-200">
                         <SelectValue placeholder="Choose form" />
                       </SelectTrigger>
-                      <SelectContent className="border-none">
+                      <SelectContent className="border-none bg-neutral-800 text-neutral-200">
                         {Object.values(DosageForm).map((form) => (
-                          <SelectItem key={form} value={form}>
+                          <SelectItem
+                            key={form}
+                            value={form}
+                            className="focus:bg-neutral-700 focus:text-neutral-100"
+                          >
                             {form}
                           </SelectItem>
                         ))}
@@ -355,7 +343,7 @@ function StepOneForm({
             name="duration.startDate"
             render={({ field }) => (
               <FormItem className="[">
-                <FormLabel className="font-normal text-[#AA9C87]">
+                <FormLabel className="font-normal text-neutral-300">
                   Start date
                 </FormLabel>
                 <FormControl>
@@ -364,7 +352,7 @@ function StepOneForm({
                       <Button
                         variant={"outline"}
                         className={cn(
-                          "w-full justify-start border-none text-left font-normal",
+                          "w-full justify-start border-none bg-neutral-800 text-left font-normal text-neutral-200",
                           !field.value && "text-muted-foreground",
                         )}
                       >
@@ -376,11 +364,10 @@ function StepOneForm({
                         )}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
+                    <PopoverContent className="w-auto overflow-hidden rounded-lg border-none bg-neutral-800 p-0">
                       <Calendar
                         mode="single"
                         selected={new Date(field.value)}
-                        // onSelect={field.onChange}
                         onSelect={(date) => {
                           if (date) {
                             field.onChange(date.toISOString());
@@ -389,6 +376,17 @@ function StepOneForm({
                         disabled={(date) =>
                           date > new Date() || date < new Date("2020-01-01")
                         }
+                        className="bg-neutral-800 text-neutral-200"
+                        classNames={{
+                          head_cell:
+                            "text-neutral-500 rounded-md w-full font-normal text-[0.8rem]",
+                          cell: "[&:has([aria-selected])]:bg-transparent",
+                          day_today: "bg-none border border-neutral-200",
+                          day_selected:
+                            " rounded-lg focus:bg-neutral-200 focus:text-neutral-800",
+                          day_outside: "text-neutral-500",
+                          day_disabled: "text-neutral-600",
+                        }}
                         initialFocus
                       />
                     </PopoverContent>
@@ -404,7 +402,7 @@ function StepOneForm({
               name="duration.endDate"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="font-normal text-[#AA9C87]">
+                  <FormLabel className="font-normal text-neutral-300">
                     End date
                   </FormLabel>
                   <FormControl>
@@ -413,26 +411,43 @@ function StepOneForm({
                         <Button
                           variant={"outline"}
                           className={cn(
-                            "w-full justify-start border-none text-left font-normal",
+                            "w-full justify-start border-none bg-neutral-800 text-left font-normal text-neutral-200",
                             !field.value && "text-muted-foreground",
                           )}
                         >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <CalendarIcon className="mr-2 h-4 w-4 text-neutral-200" />
                           {field.value ? (
                             format(field.value, "PPP")
                           ) : (
-                            <span>Pick a date</span>
+                            <span className="text-neutral-500">
+                              Pick a date
+                            </span>
                           )}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
+                      <PopoverContent className="w-auto overflow-hidden rounded-lg border-none bg-neutral-800 p-0">
                         <Calendar
                           mode="single"
+                          disabled={(date) =>
+                            date <=
+                            new Date(form.getValues().duration.startDate)
+                          }
                           // selected={field.value}
                           onSelect={(date) => {
                             if (date) {
                               field.onChange(date.toISOString());
                             }
+                          }}
+                          className="bg-neutral-800 text-neutral-200"
+                          classNames={{
+                            head_cell:
+                              "text-neutral-500 rounded-md w-full font-normal text-[0.8rem]",
+                            cell: "[&:has([aria-selected])]:bg-transparent",
+                            day_today: "bg-none border border-neutral-200",
+                            day_selected:
+                              " rounded-lg focus:bg-neutral-200 focus:text-neutral-800",
+                            day_outside: "text-neutral-500",
+                            day_disabled: "text-neutral-600",
                           }}
                           initialFocus
                         />
@@ -449,25 +464,43 @@ function StepOneForm({
           control={form.control}
           name="addEndDate"
           render={({ field }) => (
-            <FormItem className="flex items-center gap-2">
+            <FormItem className="flex items-center gap-2 text-neutral-300">
               <FormControl>
                 <Checkbox
                   checked={field.value}
                   onCheckedChange={field.onChange}
+                  className="border-neutral-300"
                 />
               </FormControl>
-              <FormLabel>End date?</FormLabel>
+              <FormLabel className="cursor-pointer">End date?</FormLabel>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={!form.formState.isValid}>
+        <Button
+          type="submit"
+          disabled={!form.formState.isValid}
+          className="bg-neutral-100 text-neutral-800 hover:bg-neutral-300"
+        >
           Next
         </Button>
       </form>
     </Form>
   );
 }
+
+const generateTimeOptions = () => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 30) {
+      const time = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+      options.push(time);
+    }
+  }
+  return options;
+};
+
+const timeOptions = generateTimeOptions();
 
 function StepTwoForm({
   setOpen,
@@ -494,11 +527,11 @@ function StepTwoForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      category: ScheduleCategory.DailyIntake,
+      category: medicine.schedule.category,
       days: [DayOfWeek.Mon, DayOfWeek.Wed, DayOfWeek.Fri],
       reminderIntake: [
         {
-          time: "06:00",
+          time: "00:00",
         },
       ],
       addReminderInterval: false,
@@ -561,6 +594,27 @@ function StepTwoForm({
     updateMedicine(defaultMedicine);
   }
 
+  // const useAvailableTimeOptions = (include?: string) => {
+  //   const { watch } = useFormContext();
+  //   const reminderIntake: { time: string }[] = watch("reminderIntake");
+
+  //   return useMemo(() => {
+  //     return timeOptions.filter(
+  //       (time) =>
+  //         time === include ||
+  //         !reminderIntake?.some((item) => item.time === time),
+  //     );
+  //   }, [reminderIntake, include]);
+  // };
+
+  // const availableTimeOptions = useMemo(() => {
+  //   return timeOptions.filter(
+  //     (time) =>
+  //       // time === include ||
+  //       !reminderIntake?.some((item) => item.time === time),
+  //   );
+  // }, [reminderIntake]);
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className={cn("space-y-4")}>
@@ -569,7 +623,9 @@ function StepTwoForm({
           name="category"
           render={({ field }) => (
             <FormItem className="col-span-2">
-              <FormLabel>Frequency</FormLabel>
+              <FormLabel className="font-normal text-neutral-300">
+                Frequency
+              </FormLabel>
               <FormControl>
                 <RadioGroup
                   onValueChange={field.onChange}
@@ -578,51 +634,18 @@ function StepTwoForm({
                   {Object.values(ScheduleCategory).map((category) => (
                     <FormItem
                       key={category}
-                      className="flex items-center space-x-3 space-y-0"
+                      className="flex items-center space-x-3 space-y-0 text-neutral-300"
                     >
                       <FormControl>
-                        <RadioGroupItem value={category} />
+                        <RadioGroupItem
+                          value={category}
+                          className="border-neutral-200 text-neutral-200"
+                        />
                       </FormControl>
                       <FormLabel className="font-normal">{category}</FormLabel>
                     </FormItem>
                   ))}
-                  {/* <FormItem className="flex items-center space-x-3 space-y-0">
-
-                    <FormControl>
-                      <RadioGroupItem value="daily" />
-                    </FormControl>
-                    <FormLabel className="font-normal">Daily</FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="specific" />
-                    </FormControl>
-                    <FormLabel className="font-normal">
-                      Specific day of the week
-                    </FormLabel>
-                  </FormItem>
-                  <FormItem className="flex items-center space-x-3 space-y-0">
-                    <FormControl>
-                      <RadioGroupItem value="interval" />
-                    </FormControl>
-                    <FormLabel className="font-normal">As needed</FormLabel>
-                  </FormItem> */}
                 </RadioGroup>
-                {/* <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select frequency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="daily">Daily</SelectItem>
-                    <SelectItem value="specific">
-                      Specific day of the week
-                    </SelectItem>
-                    <SelectItem value="interval">As needed</SelectItem>
-                  </SelectContent>
-                </Select> */}
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -631,7 +654,7 @@ function StepTwoForm({
         <div className="space-y-2">
           {form.watch().category === ScheduleCategory.DailyIntake ? (
             <>
-              <p>Intakes</p>
+              <p className="text-sm text-neutral-300">Intakes</p>
               {fields.map((item, index) => (
                 <FormField
                   key={item.id}
@@ -640,15 +663,43 @@ function StepTwoForm({
                   render={({ field }) => (
                     <FormItem className="flex items-center gap-2 space-y-0">
                       <FormControl>
-                        <Input type="time" {...field} className="w-full" />
+                        <>
+                          <span className="text-neutral-300">{index + 1}.</span>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                            value={field.value}
+                            onOpenChange={() => {
+                              console.log(field.value);
+                            }}
+                          >
+                            <SelectTrigger className="w-full rounded-lg border-none bg-neutral-800 text-neutral-200">
+                              <SelectValue
+                                placeholder="Select time"
+                                className="text-neutral-200"
+                              />
+                            </SelectTrigger>
+                            <SelectContent className="border-none bg-neutral-800 text-neutral-200">
+                              {timeOptions.map((time) => (
+                                <SelectItem
+                                  key={time}
+                                  value={time}
+                                  className="focus:bg-neutral-700 focus:text-neutral-100"
+                                >
+                                  {time}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </>
                       </FormControl>
                       <Button
                         type="button"
-                        variant="outline"
-                        className="p-2"
+                        variant="ghost"
+                        className="p-2 text-neutral-300"
                         onClick={() => remove(index)}
                       >
-                        <Trash size={20} />
+                        <X size={20} />
                       </Button>
                     </FormItem>
                   )}
@@ -657,10 +708,10 @@ function StepTwoForm({
               <Button
                 type="button"
                 variant="ghost"
-                className="gap-2 ps-2"
+                className="ps-2 text-neutral-300"
                 onClick={() => {
                   append({
-                    time: "00:00",
+                    time: timeOptions[0],
                   });
                 }}
               >
@@ -675,8 +726,10 @@ function StepTwoForm({
                 control={form.control}
                 name="days"
                 render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Choose day</FormLabel>
+                  <FormItem className="col-span-2 text-neutral-300">
+                    <FormLabel className="text-sm font-normal">
+                      Choose day
+                    </FormLabel>
                     <FormControl>
                       <ToggleGroup
                         type="multiple"
@@ -688,8 +741,9 @@ function StepTwoForm({
                             key={day}
                             value={day}
                             aria-label={`Toggle ${day}`}
+                            className="aspect-square rounded-full"
                           >
-                            {day.toUpperCase()}
+                            {day[0].toUpperCase()}
                           </ToggleGroupItem>
                         ))}
                       </ToggleGroup>
@@ -701,7 +755,7 @@ function StepTwoForm({
                   </FormItem>
                 )}
               />
-              <p>Intakes</p>
+              <p className="text-sm font-normal text-neutral-300">Intakes</p>
               {fields.map((item, index) => (
                 <FormField
                   key={item.id}
@@ -709,16 +763,42 @@ function StepTwoForm({
                   name={`reminderIntake.${index}.time`}
                   render={({ field }) => (
                     <FormItem className="flex items-center gap-2 space-y-0">
+                      <span className="text-neutral-300">{index + 1}.</span>
                       <FormControl>
-                        <Input type="time" {...field} className="w-full" />
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                          onOpenChange={() => {
+                            console.log(field.value);
+                          }}
+                        >
+                          <SelectTrigger className="w-full rounded-lg border-none bg-neutral-800 text-neutral-200">
+                            <SelectValue
+                              placeholder="Select time"
+                              className="text-neutral-200"
+                            />
+                          </SelectTrigger>
+                          <SelectContent className="border-none bg-neutral-800 text-neutral-200">
+                            {timeOptions.map((time) => (
+                              <SelectItem
+                                key={time}
+                                value={time}
+                                className="focus:bg-neutral-700 focus:text-neutral-100"
+                              >
+                                {time}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <Button
                         type="button"
-                        variant="outline"
-                        className="p-2"
+                        variant="ghost"
+                        className="p-2 text-neutral-300"
                         onClick={() => remove(index)}
                       >
-                        <Trash size={20} />
+                        <X size={20} />
                       </Button>
                     </FormItem>
                   )}
@@ -748,7 +828,32 @@ function StepTwoForm({
                   render={({ field }) => (
                     <FormItem className="flex items-center gap-2 space-y-0">
                       <FormControl>
-                        <Input type="time" className="w-full" {...field} />
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          value={field.value}
+                          onOpenChange={() => {
+                            console.log(field.value);
+                          }}
+                        >
+                          <SelectTrigger className="w-full rounded-lg border-none bg-neutral-800 text-neutral-200">
+                            <SelectValue
+                              placeholder="Select time"
+                              className="text-neutral-200"
+                            />
+                          </SelectTrigger>
+                          <SelectContent className="border-none bg-neutral-800 text-neutral-200">
+                            {timeOptions.map((time) => (
+                              <SelectItem
+                                key={time}
+                                value={time}
+                                className="focus:bg-neutral-700 focus:text-neutral-100"
+                              >
+                                {time}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItem>
                   )}
@@ -758,11 +863,12 @@ function StepTwoForm({
                 control={form.control}
                 name="addReminderInterval"
                 render={({ field }) => (
-                  <FormItem className="flex items-center gap-2">
+                  <FormItem className="flex items-center gap-2 text-neutral-300">
                     <FormControl>
                       <Checkbox
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        className="border-neutral-300"
                       />
                     </FormControl>
                     <FormLabel>Reminder between dose?</FormLabel>
@@ -773,7 +879,10 @@ function StepTwoForm({
             </>
           ) : null}
         </div>
-        <Button type="submit" className="w-full">
+        <Button
+          type="submit"
+          className="w-full bg-neutral-100 text-neutral-800 hover:bg-neutral-300"
+        >
           Submit
         </Button>
         {/* <DrawerClose className="w-full">

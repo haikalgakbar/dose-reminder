@@ -1,12 +1,12 @@
-import { StrictMode } from "react";
+import "@/styles/index.css";
 import ReactDOM from "react-dom/client";
+import { StrictMode } from "react";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import "./index.css";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
 
-const router = createRouter({ routeTree });
+const router = createRouter({ routeTree, trailingSlash: "preserve" });
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
@@ -24,5 +24,3 @@ if (!rootElement.innerHTML) {
     </StrictMode>,
   );
 }
-
-// <RouterProvider router={router} />,

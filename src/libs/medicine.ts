@@ -69,28 +69,28 @@ export async function addMedicine(medicine: TMedicine) {
 
 export default function handleTakeMedicine(
   medication: MedicineTransaction,
-  transaction: TTransactionRecord[],
+  transaction: TTransactionRecord,
 ) {
-  const updatedTransaction = transaction.map((trx) => {
-    const medications = trx.medications.map((med) => {
+  const updatedTransaction = {
+    ...transaction,
+    medications: transaction.medications.map((med) => {
       if (med.medicineId === medication.medicineId) {
         return {
           ...med,
           consumedAt: [...med.consumedAt, format(new Date(), "HH:mm")],
+          isSkip: false,
         };
       }
       return med;
-    });
-    return {
-      ...trx,
-      medications,
-    };
-  });
+    }),
+  };
 
   const newTransaction = processTransaction(
-    updatedTransaction[0].id,
-    updatedTransaction[0].medications,
+    updatedTransaction.id,
+    updatedTransaction.medications,
   );
+
+  console.log(transaction);
 
   updateData(DB_NAME, TRANSACTION_STORE, newTransaction);
 }

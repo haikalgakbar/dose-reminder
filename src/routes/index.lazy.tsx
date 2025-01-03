@@ -1,221 +1,183 @@
-import WeeklyCalendar from "@/components/home/weekly-calendar";
-import MedicineCardHome from "@/components/home/medicine-card-home";
-import useDailyTransactions from "@/hooks/useDailyTransaction";
+import Header from "@/features/checkin/components/header";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
-import { getDailyReminderMedicines } from "@/libs/reminder";
-import { CalendarOff } from "lucide-react";
 import { MedicineTransaction, TTransactionRecord } from "@/types/transaction";
-import { isArrayEmpty } from "@/libs/util";
+import { getCurrentDate, isArrayEmpty } from "@/libs/util";
+import {
+  TMedicine,
+  ScheduleCategory,
+  DailySchedule,
+  SpecificDaysSchedule,
+  AsNeededSchedule,
+} from "@/types/medicine";
+import { useEffect, useState } from "react";
+import { getDatas } from "@/libs/db";
+import { DB_NAME, TRANSACTION_STORE } from "@/constant/db";
+import { DetailMedicine } from "@/features/checkin/components/detail-medicine";
+import { Apple } from "lucide-react";
 
 export const Route = createLazyFileRoute("/")({
   component: Home,
 });
 
-// function Home() {
-//   const { dailyTransaction, isLoading } = useDailyTransactions();
+type MedicineWithTime = Omit<TMedicine, "schedule"> & {
+  schedule:
+    | { category: ScheduleCategory.DailyIntake; details: DailySchedule }
+    | {
+        category: ScheduleCategory.SpecificDays;
+        details: SpecificDaysSchedule;
+      };
+};
 
-//   if (isLoading) {
-//     return <div>Loading...</div>;
-//   }
+type MedicineOptional = Omit<TMedicine, "schedule"> & {
+  schedule: {
+    category: ScheduleCategory.TakeAsNeeded;
+    details: AsNeededSchedule;
+  };
+};
 
-//   if (!isLoading && dailyTransaction.length > 0) {
-//     const { takeNow, comingUp, takeLater, takeAsNeeded } =
-//       getDailyReminderMedicines(dailyTransaction[0].medications);
+type MedicineTime = {
+  time: string;
+  data: MedicineWithTime[];
+};
 
-//     return (
-//       <>
-//         <WeeklyCalendar />
-//         {!isArrayEmpty(takeNow) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               <span className="relative flex h-3 w-3 items-center justify-center">
-//                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F96C00] opacity-50"></span>
-//                 <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F96C00]"></span>
-//               </span>
-//               Take now
-//             </header>
-//             {takeNow.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//         {!isArrayEmpty(comingUp) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               Coming up in{" "}
-//               {formatDistanceToNow(
-//                 new Date().setHours(
-//                   +comingUp[0].timeToConsume!.split(":")[0],
-//                   +comingUp[0].timeToConsume!.split(":")[1],
-//                 ),
-//               )}
-//             </header>
-//             {comingUp.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//         {!isArrayEmpty(takeLater) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               Take later today
-//             </header>
-//             {takeLater.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//         {!isArrayEmpty(takeAsNeeded) ? (
-//           <section id="take-now" className="space-y-2 px-4 py-2 pb-28">
-//             <header className="flex items-center gap-2 font-medium text-slate-700">
-//               Take as needed
-//             </header>
-//             {takeAsNeeded.map((med, index) => (
-//               <MedicineCardHome
-//                 key={index}
-//                 medication={med}
-//                 transaction={dailyTransaction}
-//               />
-//             ))}
-//           </section>
-//         ) : null}
-//       </>
-//     );
-//   } else {
-//     return (
-//       <>
-//         <WeeklyCalendar />
-//         <section
-//           id="empty-schedule"
-//           className="flex h-dvh flex-col items-center justify-center text-[#33302E]"
-//         >
-//           <div className="rounded-full bg-white/70 p-4">
-//             <CalendarOff size={24} className="text-[#FFD2A7]" />
-//           </div>
-//           <h2 className="text-xl font-medium">Your schedule is clear 🙌</h2>
-//           <p>Remember to rest or add new medication if necessary.</p>
-//         </section>
-//       </>
-//     );
-//   }
-// }
+export type Medicine = {
+  all: TTransactionRecord[];
+  today: {
+    withTime: MedicineTime[];
+    optional: MedicineOptional[];
+  };
+};
 
 function Home() {
-  const { dailyTransaction, isLoading } = useDailyTransactions();
+  const [loading, setLoading] = useState(true);
+  const [medicines, setMedicines] = useState<Medicine | undefined>(undefined);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    setLoading(true);
+    async function fetchMedicines() {
+      // Fetch the last 7 transaction records
+      const response = (await getDatas(DB_NAME, TRANSACTION_STORE)).slice(
+        -7,
+      ) as TTransactionRecord[];
 
-  if (dailyTransaction.length > 0) {
-    const { takeNow, comingUp, takeLater, takeAsNeeded } =
-      getDailyReminderMedicines(dailyTransaction[0].medications);
+      if (isArrayEmpty(response)) {
+        const emptyMedicines: Medicine = {
+          all: [],
+          today: {
+            withTime: [],
+            optional: [],
+          },
+        };
+        setMedicines(emptyMedicines);
+        setLoading(false);
+        return;
+      }
 
+      // Filter today's medications based on the current date
+      const todayMeds = response.filter((res) => res.id === getCurrentDate());
+      const today = todayMeds[0];
+
+      // Separate medications into those with a specific schedule and those taken as needed
+      const withTime = today.medications.filter(
+        (med) =>
+          med.schedule.category !== ScheduleCategory.TakeAsNeeded &&
+          med.consumedAt.length === 0,
+      ) as unknown as MedicineWithTime[];
+
+      const optional = today.medications.filter(
+        (med) => med.schedule.category === ScheduleCategory.TakeAsNeeded,
+      ) as unknown as MedicineOptional[];
+
+      // Group medications by their scheduled time
+      const withTimeMap = Map.groupBy(
+        withTime,
+        (item) => item.schedule.details.times[0],
+      );
+
+      // Convert the grouped medications into the desired format
+      const medicineWithTime = Array.from(withTimeMap, ([key, value]) => ({
+        time: key,
+        data: value,
+      })) as unknown as MedicineTime[];
+
+      // Update the state with the new medication data
+      setMedicines({
+        all: response,
+        today: {
+          withTime: medicineWithTime,
+          optional,
+        },
+      });
+
+      setLoading(false);
+    }
+    fetchMedicines();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+  if (
+    medicines?.today.optional.length === 0 &&
+    medicines?.today.withTime.length === 0
+  )
     return (
-      <>
-        <WeeklyCalendar />
-        {!isArrayEmpty(takeNow) ? (
-          <Section
-            medications={takeNow}
-            headerText="Take now"
-            transaction={dailyTransaction}
-          />
-        ) : null}
-        {!isArrayEmpty(comingUp) ? (
-          <Section
-            medications={comingUp}
-            headerText="Coming up in"
-            time={formatDistanceToNow(
-              new Date().setHours(
-                +comingUp[0].timeToConsume!.split(":")[0],
-                +comingUp[0].timeToConsume!.split(":")[1],
-              ),
-            )}
-            transaction={dailyTransaction}
-          />
-        ) : null}
-        {!isArrayEmpty(takeLater) ? (
-          <Section
-            medications={takeLater}
-            headerText="Take later"
-            time="today"
-            transaction={dailyTransaction}
-          />
-        ) : null}
-        {!isArrayEmpty(takeAsNeeded) ? (
-          <Section
-            medications={takeAsNeeded}
-            headerText="Take as needed"
-            transaction={dailyTransaction}
-          />
-        ) : null}
-      </>
-    );
-  } else {
-    return (
-      <>
-        <WeeklyCalendar />
-        <section
-          id="empty-schedule"
-          className="flex h-dvh flex-col items-center justify-center text-[#33302E]"
-        >
-          <div className="rounded-full bg-white/70 p-4">
-            <CalendarOff size={24} className="text-[#FFD2A7]" />
+      <main className="flex min-h-screen w-full max-w-xl flex-col">
+        <Header transactions={medicines!.all} />
+        <section className="flex flex-1 flex-col items-center justify-center gap-2 p-4 pb-48 text-neutral-400">
+          <div className="h-full w-fit rounded-full bg-neutral-800 p-4">
+            <Apple className="text-white" />
           </div>
-          <h2 className="text-xl font-medium">Your schedule is clear 🙌</h2>
-          <p>Remember to rest or add new medication if necessary.</p>
+          <h2 className="text-2xl font-medium text-neutral-200">
+            Your schedule is clear
+          </h2>
+          <p className="text-center">
+            Remember to rest or add new medication if necessary.
+          </p>
         </section>
-      </>
+      </main>
     );
-  }
-}
 
-function Section({
-  medications,
-  headerText,
-  time,
-  transaction,
-}: {
-  medications: MedicineTransaction[];
-  headerText: string;
-  time?: string;
-  transaction: TTransactionRecord[];
-}) {
   return (
-    <section id="take-now" className="space-y-2 px-4 py-2">
-      <header className="flex items-center gap-2 font-medium text-slate-700">
-        {time ? (
-          `${headerText} ${time}`
-        ) : (
-          <>
-            <span className="relative flex h-3 w-3 items-center justify-center">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#F96C00] opacity-50"></span>
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[#F96C00]"></span>
-            </span>
-            {headerText}
-          </>
-        )}
-      </header>
-      {medications.map((med, index) => (
-        <MedicineCardHome
+    <main className="w-full max-w-2xl">
+      <Header transactions={medicines!.all} />
+      {medicines?.today.withTime.map((item, index) => (
+        <section
           key={index}
-          medication={med}
-          transaction={transaction}
-        />
+          className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24"
+        >
+          <header>
+            <h2 className="text-xl font-medium">{item.time}</h2>
+          </header>
+          <div className="rounded-xl bg-[#262626]">
+            {item.data.map((med) => (
+              <DetailMedicine
+                key={med.id}
+                medicine={med as unknown as MedicineTransaction}
+                setMedicine={setMedicines}
+                transaction={
+                  medicines.all.filter((med) => med.id === getCurrentDate())[0]
+                }
+              />
+            ))}
+          </div>
+        </section>
       ))}
-    </section>
+      {medicines?.today.optional.length ? (
+        <section className="flex flex-col gap-2 p-4 text-[#F5F5F5] last:mb-24">
+          <header>
+            <h2 className="text-xl font-medium">Take as needed</h2>
+          </header>
+          <div className="rounded-xl bg-[#262626]">
+            {medicines?.today.optional.map((med) => (
+              <DetailMedicine
+                key={med.id}
+                medicine={med as unknown as MedicineTransaction}
+                setMedicine={setMedicines}
+                transaction={medicines.all[6]}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
+    </main>
   );
 }
