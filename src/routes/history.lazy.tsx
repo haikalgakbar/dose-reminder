@@ -56,12 +56,8 @@ function History() {
       }
     });
 
-    return () => {
-      setIsMounted(false);
-    };
+    return () => setIsMounted(false);
   }, []);
-
-  if (isMounted) return <div>Loading...</div>;
 
   return (
     <main className="flex min-h-screen w-full max-w-xl flex-col">

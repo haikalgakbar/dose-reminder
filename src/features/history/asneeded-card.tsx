@@ -48,12 +48,12 @@ export function AsNeededCard({
   medicine: MedicineTransactionAsNeeded;
   transaction: TTransactionRecord;
 }) {
-  if (isArrayEmpty(medicine.consumedAt)) return null;
-
   const [open, setOpen] = useState(false);
   const [content, setContent] = useState<"detail" | "edit">("detail");
   const [intakeIndex, setIntakeIndex] = useState<undefined | number>(undefined);
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (isArrayEmpty(medicine.consumedAt)) return null;
 
   if (isDesktop) {
     return (

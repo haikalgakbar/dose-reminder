@@ -22,6 +22,7 @@ function Root() {
     async function dailyTransaction() {
       createDailyTransaction();
     }
+
     dailyTransaction();
   }, []);
 

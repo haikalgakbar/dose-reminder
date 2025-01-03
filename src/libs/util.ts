@@ -68,7 +68,7 @@ export function saveToLocalStorage<T>(key: string, item: T) {
 }
 
 export function getItemFromLocalStorage(key: string): string {
-  return JSON.parse(localStorage.getItem(key) ?? "");
+  return JSON.parse(localStorage.getItem(key) ?? "{}");
 }
 
 export function sortDays(arr: string[]) {
@@ -191,28 +191,30 @@ export function isMedicineValid(medicine: TMedicine, date: string): boolean {
 }
 
 export async function createDailyTransaction() {
-  const dates = eachDayOfInterval({
-    start: getItemFromLocalStorage(LAST_LOGIN),
-    end: getCurrentDate(),
-  });
+  if (!getItemFromLocalStorage(LAST_LOGIN)) {
+    const dates = eachDayOfInterval({
+      start: getItemFromLocalStorage(LAST_LOGIN),
+      end: getCurrentDate(),
+    });
 
-  let previousDate: string | undefined;
+    let previousDate: string | undefined;
 
-  for (const date of dates) {
-    if (previousDate) {
-      await updatePreviousTransaction(previousDate);
-    }
-
-    const medications = await getDatas<TMedicine>(DB_NAME, MEDICINE_STORE);
-    for (const medication of medications) {
-      if (isMedicineValid(medication, date.toISOString())) {
-        await processMedicationsForDate(date, medication);
+    for (const date of dates) {
+      if (previousDate) {
+        await updatePreviousTransaction(previousDate);
       }
-    }
 
-    previousDate = date.toISOString();
-    saveToLocalStorage(LAST_LOGIN, getCurrentDate());
+      const medications = await getDatas<TMedicine>(DB_NAME, MEDICINE_STORE);
+      for (const medication of medications) {
+        if (isMedicineValid(medication, date.toISOString())) {
+          await processMedicationsForDate(date, medication);
+        }
+      }
+
+      previousDate = date.toISOString();
+    }
   }
+  saveToLocalStorage(LAST_LOGIN, getCurrentDate());
 }
 
 async function updatePreviousTransaction(previousDate: string) {

@@ -6,7 +6,7 @@
   ],
   "compilerOptions": {
     "target": "ES6",
-    "lib": ["ESNext"],
+    "lib": ["ES6"],
     "module": "ESNext",
     "baseUrl": ".",
     "paths": {
